@@ -47,7 +47,7 @@ public:
     RevEngineMain(UINT width, UINT height, std::wstring name);
 
     virtual void OnInit();
-    virtual void OnUpdate();
+    virtual void OnUpdate(float delta);
     virtual void OnRender();
     virtual void OnDestroy();
 
@@ -99,7 +99,7 @@ public:
     void OnButtonDown(UINT32 lParam);
     virtual void OnKeyDown(UINT8 /*key*/)   {}
     void OnMouseMove(UINT8 wParam, UINT32 lParam);
-    void UpdateInput();
+    void UpdateInput(float delta);
     
     /// Create the acceleration structure of an instance
     ///

@@ -24,7 +24,7 @@ public:
 
     void OnMoveDelta(float deltaX, float deltaY);
     void Initialize(float aspectRatio);
-    void Update(float tick, const RevInputState& input);
+    void Update(float deltaTime, const RevInputState& input);
 };
 
 

@@ -24,22 +24,22 @@ void RevCamera::OnMoveDelta(float deltaX, float deltaY)
         m_yaw = -180.0f + remaining;
     }
     else
-        if(m_yaw < -180.f)
-        {
-            float remaining = -180.0f - abs(m_yaw);
-            m_yaw = 180.0f + remaining;
-        }
+    if(m_yaw < -180.f)
+    {
+        float remaining = -180.0f - abs(m_yaw);
+        m_yaw = 180.0f + remaining;
+    }
     if(m_pitch > 180.f)
     {
         float remaining = abs(m_pitch) - 180.0f;
         m_pitch = -180.0f + remaining;
     }
     else
-        if(m_pitch < -180.f)
-        {
-            float remaining = -180.0f - abs(m_pitch);
-            m_pitch = 180.0f + remaining;
-        }
+    if(m_pitch < -180.f)
+    {
+        float remaining = -180.0f - abs(m_pitch);
+        m_pitch = 180.0f + remaining;
+    }
 
     float pitchRadian = m_pitch * (XM_PI / 180.0f);
     float yawRadian = m_yaw* (XM_PI / 180.0f);
@@ -67,9 +67,9 @@ void RevCamera::Initialize(float aspectRatio)
     m_matrices.push_back(XMMatrixInverse(&det2, m_matrices[1]));
 }
 
-void RevCamera::Update(float tick, const RevInputState& input)
+void RevCamera::Update(float deltaTime, const RevInputState& input)
 {
-    float movementSpeed = 0.1;
+    float movementSpeed = 25.0f;
     XMVECTOR det;
     XMMATRIX cameraView = XMMatrixInverse(&det, m_matrices[0]);
     XMVECTOR worldLoc = cameraView.r[3];
@@ -78,27 +78,27 @@ void RevCamera::Update(float tick, const RevInputState& input)
     XMVECTOR forward = cameraView.r[2];
     if(input.m_right)
     {
-        worldLoc += right * movementSpeed;
+        worldLoc += right * movementSpeed * deltaTime;
     }
     if(input.m_left)
     {
-        worldLoc += -right * movementSpeed;
+        worldLoc += -right * movementSpeed * deltaTime;
     }
     if(input.m_down)
     {
-        worldLoc += -up * movementSpeed;
+        worldLoc += -up * movementSpeed*deltaTime;
     }
     if(input.m_up)
     {
-        worldLoc += up * movementSpeed;
+        worldLoc += up * movementSpeed*deltaTime;
     }
     if(input.m_forward)
     {
-        worldLoc += -forward * movementSpeed;
+        worldLoc += -forward * movementSpeed*deltaTime;
     }
     if(input.m_back)
     {
-        worldLoc += forward * movementSpeed;
+        worldLoc += forward * movementSpeed*deltaTime;
     }
 	
     m_worldLoc = worldLoc;

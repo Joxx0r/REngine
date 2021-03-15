@@ -341,9 +341,9 @@ void RevEngineMain::LoadAssets()
 
 
 // Update frame-based values.
-void RevEngineMain::OnUpdate()
+void RevEngineMain::OnUpdate(float delta)
 {
-	UpdateInput();
+	UpdateInput(delta);
 	UpdateCameraBuffer();
 }
 
@@ -582,7 +582,7 @@ void RevEngineMain::OnMouseMove(UINT8 wParam, UINT32 lParam)
 	}
 }
 
-void RevEngineMain::UpdateInput()
+void RevEngineMain::UpdateInput(float delta)
 {
 	m_input.m_ctrl = GetAsyncKeyState(VK_CONTROL);
 	m_input.m_shift = GetAsyncKeyState(VK_SHIFT);
@@ -598,7 +598,7 @@ void RevEngineMain::UpdateInput()
 	m_input.m_down = GetAsyncKeyState(VK_DOWN);
 	m_input.m_forward = GetAsyncKeyState(87);
 	m_input.m_back = GetAsyncKeyState(83);
-	m_camera.Update(0.1f, m_input);
+	m_camera.Update(delta, m_input);
 }
 
 //-----------------------------------------------------------------------------

@@ -68,23 +68,43 @@ int Win32Application::Run(RevEngineMain* pSample, HINSTANCE hInstance, int nCmdS
     
     // Main sample loop.
     MSG msg = {};
+    double frameUpdateTime = 0.0f;
+    float targetFrameRate = 1/144.0f;
     while (msg.message != WM_QUIT)
     {
+        QueryPerformanceCounter(&startTime);
+        double deltaTime = (double)(startTime.QuadPart - endTime.QuadPart) / (double)(frequency.QuadPart);
+        endTime = startTime;
+        frameUpdateTime  += deltaTime;
+        if(frameUpdateTime >= targetFrameRate)
+        {
+            while(frameUpdateTime > 0.0f && frameUpdateTime >= targetFrameRate)
+            {
+                double newDelta = (frameUpdateTime - targetFrameRate);
+                if(newDelta > 0.0)
+                {
+                    frameUpdateTime -= targetFrameRate;
+                }
+                else
+                {
+                    frameUpdateTime = 0.0;
+                }
+                pSample->OnUpdate(targetFrameRate);
+                pSample->OnRender();
+            }
+        }
+        else
+        {
+            Sleep(1);
+        }
+        
         // Process any messages in the queue.
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
-            if(msg.message == WM_PAINT)
-            {
-                QueryPerformanceCounter(&startTime);
-                double update = (double)(startTime.QuadPart - endTime.QuadPart) / (double)(frequency.QuadPart);
-                endTime = startTime;
-                pSample->OnUpdate();
-                pSample->OnRender();
-            }
-            else
+            if(msg.message != WM_PAINT)
             {
                 TranslateMessage(&msg);
-                DispatchMessage(&msg);   
+                DispatchMessage(&msg);  
             }
         }
     }
@@ -124,14 +144,6 @@ LRESULT CALLBACK Win32Application::WindowProc(HWND hWnd, UINT message, WPARAM wP
         if (pSample)
         {
             pSample->OnKeyUp(static_cast<UINT8>(wParam));
-        }
-        return 0;
-
-    case WM_PAINT:
-        if (pSample)
-        {
-            pSample->OnUpdate();
-            pSample->OnRender();
         }
         return 0;
     case WM_LBUTTONDOWN:
