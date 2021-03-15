@@ -11,14 +11,13 @@
 
 #pragma once
 
-#include "DXSample.h"
-
+class RevEngineMain;
 class DXSample;
 
 class Win32Application
 {
 public:
-    static int Run(DXSample* pSample, HINSTANCE hInstance, int nCmdShow);
+    static int Run(RevEngineMain* pSample, HINSTANCE hInstance, int nCmdShow);
     static HWND GetHwnd() { return m_hwnd; }
 
 protected:

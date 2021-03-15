@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <DirectXMath.h>
 
-class D3D12HelloTriangle;
+class RevEngineMain;
 struct RevInputState;
 using namespace DirectX;
 

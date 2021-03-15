@@ -114,8 +114,7 @@
   <ItemGroup>
     <ClInclude Include="BottomLevelASGenerator.h" />
     <ClInclude Include="Core\RevCamera.h" />
-    <ClInclude Include="D3D12HelloTriangle.h" />
-    <ClInclude Include="D3D12HelloTriangleTwo.h" />
+    <ClInclude Include="RevEngineMain.h" />
     <ClInclude Include="DXRHelper.h" />
     <ClInclude Include="Misc\RevTypes.h" />
     <ClInclude Include="RaytracingPipelineGenerator.h" />
@@ -124,7 +123,6 @@
     <ClInclude Include="TopLevelASGenerator.h" />
     <ClInclude Include="Win32Application.h" />
     <ClInclude Include="d3dx12.h" />
-    <ClInclude Include="DXSample.h" />
     <ClInclude Include="DXSampleHelper.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -197,8 +195,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Core\RevCamera.cpp" />
-    <ClCompile Include="D3D12HelloTriangle.cpp" />
-    <ClCompile Include="D3D12HelloTriangleTwo.cpp" />
+    <ClCompile Include="RevEngineMain.cpp" />
     <ClCompile Include="RaytracingPipelineGenerator.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -863,7 +860,6 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Win32Application.cpp" />
-    <ClCompile Include="DXSample.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

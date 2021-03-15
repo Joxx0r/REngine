@@ -11,11 +11,11 @@
 
 #include "stdafx.h"
 #include "Win32Application.h"
+#include "RevEngineMain.h"
 
 HWND Win32Application::m_hwnd = nullptr;
 
-
-int Win32Application::Run(DXSample* pSample, HINSTANCE hInstance, int nCmdShow)
+int Win32Application::Run(RevEngineMain* pSample, HINSTANCE hInstance, int nCmdShow)
 {
     // Parse the command line parameters
     int argc;
@@ -98,7 +98,7 @@ int Win32Application::Run(DXSample* pSample, HINSTANCE hInstance, int nCmdShow)
 // Main message handler for the sample.
 LRESULT CALLBACK Win32Application::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    DXSample* pSample = reinterpret_cast<DXSample*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+    RevEngineMain* pSample = reinterpret_cast<RevEngineMain*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
     switch (message)
     {
