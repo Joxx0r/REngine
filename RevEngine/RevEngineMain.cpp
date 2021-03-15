@@ -298,7 +298,9 @@ void RevEngineMain::LoadAssets()
 		// used here for code simplicity and because there are very few verts to
 		// actually transfer.
 		ThrowIfFailed(m_device->CreateCommittedResource(
+			// ReSharper disable once CppMsExtAddressOfClassRValue
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
+			// ReSharper disable once CppMsExtAddressOfClassRValue
 			&CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize),
 			D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
 			IID_PPV_ARGS(&m_vertexBuffer)));
@@ -1112,7 +1114,7 @@ void RevEngineMain::CreateCameraBuffer() {
 
 	// Get a handle to the heap memory on the CPU side, to be able to write the
 	// descriptors directly
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle =
+	const D3D12_CPU_DESCRIPTOR_HANDLE srvHandle =
         m_constHeap->GetCPUDescriptorHandleForHeapStart();
 	m_device->CreateConstantBufferView(&cbvDesc, srvHandle);
 }

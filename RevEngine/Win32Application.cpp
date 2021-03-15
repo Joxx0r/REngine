@@ -163,6 +163,7 @@ LRESULT CALLBACK Win32Application::WindowProc(HWND hWnd, UINT message, WPARAM wP
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
+    default: ;
     }
 
     // Handle any messages the switch statement didn't.
