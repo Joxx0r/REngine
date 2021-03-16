@@ -43,8 +43,27 @@ void RevModel::Initialize(int type, ID3D12Device5* device)
 }
 void RevModel::DrawRasterized(ID3D12GraphicsCommandList4* list) const
 {
-	list->IASetVertexBuffers(0, 1, &m_baseData.m_d3dData.m_vertexBufferView);
-	list->IASetIndexBuffer(&m_baseData.m_d3dData.m_indexBufferView);	
+	bool drawIndexed = false;
+	if(m_baseData.m_d3dData.m_vertexBuffer.Get())
+	{
+		list->IASetVertexBuffers(0, 1, &m_baseData.m_d3dData.m_vertexBufferView);
+	}
+	if(m_baseData.m_d3dData.m_indexBuffer.Get())
+	{
+		drawIndexed = true;
+		list->IASetIndexBuffer(&m_baseData.m_d3dData.m_indexBufferView);
+	}
+
+	const int indexCount = m_baseData.m_modelData.m_indices.size();
+	const int vertexCount = m_baseData.m_modelData.m_vertexes.size();
+	if(drawIndexed)
+	{
+		list->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+	}
+	else
+	{
+		list->DrawInstanced(vertexCount, 1, 0, 0);
+	}
 }
 
 AccelerationStructureBuffers RevModel::CreateStructureBuffer(ID3D12Device5* device, ID3D12GraphicsCommandList4* list)
