@@ -78,6 +78,8 @@ public:
     ComPtr<ID3D12Resource> m_vertexBuffer;
     D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
 
+    std::vector<Vertex> m_vertexes;
+
     // Synchronization objects.
     UINT m_frameIndex;
     HANDLE m_fenceEvent;

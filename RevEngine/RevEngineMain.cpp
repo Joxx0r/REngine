@@ -284,13 +284,16 @@ void RevEngineMain::LoadAssets()
 	// Create the vertex buffer.
 	{
 		// Define the geometry for a triangle.
-		Vertex triangleVertices[] = {
+		m_vertexes = {
 			{{0.0f, 0.25f * m_aspectRatio, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
 			{{0.25f, -0.25f * m_aspectRatio, 0.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
-			{{-0.25f, -0.25f * m_aspectRatio, 0.0f}, {1.0f, 0.0f, 1.0f, 1.0f}}
+			{{-0.25f, -0.25f * m_aspectRatio, 0.0f}, {1.0f, 0.0f, 1.0f, 1.0f}},
+			{{1.25f, 1.25f * m_aspectRatio, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
+			{{1.25f, 0.75f * m_aspectRatio, 0.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
+			{{0.75f, 0.75f * m_aspectRatio, 0.0f}, {1.0f, 0.0f, 1.0f, 1.0f}}
 		};
 
-		const UINT vertexBufferSize = sizeof(triangleVertices);
+		const UINT vertexBufferSize = sizeof(Vertex) * m_vertexes.size();
 
 		// Note: using upload heaps to transfer static data like vert buffers is not
 		// recommended. Every time the GPU needs it, the upload heap will be
@@ -311,7 +314,7 @@ void RevEngineMain::LoadAssets()
 			0, 0); // We do not intend to read from this resource on the CPU.
 		ThrowIfFailed(m_vertexBuffer->Map(
 			0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
-		memcpy(pVertexDataBegin, triangleVertices, sizeof(triangleVertices));
+		memcpy(pVertexDataBegin, m_vertexes.data(), vertexBufferSize);
 		m_vertexBuffer->Unmap(0, nullptr);
 
 		// Initialize the vertex buffer view.
@@ -722,7 +725,7 @@ void RevEngineMain::CreateAccelerationStructures()
 {
 	// Build the bottom AS from the Triangle vertex buffer
 	AccelerationStructureBuffers bottomLevelBuffers =
-		CreateBottomLevelAS({{m_vertexBuffer.Get(), 3}});
+		CreateBottomLevelAS({{m_vertexBuffer.Get(), m_vertexes.size()}});
 	AccelerationStructureBuffers planeBottomLevelBuffers =
 	CreateBottomLevelAS({{m_planeBuffer.Get(), 6}});
 
