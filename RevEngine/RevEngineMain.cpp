@@ -820,7 +820,6 @@ ComPtr<id3d12rootsignature> RevEngineMain::CreateHitSignature() const
 {
 	nv_helpers_dx12::RootSignatureGenerator rsc;
 	rsc.AddRootParameter(D3D12_ROOT_PARAMETER_TYPE_CBV, 0);
-	rsc.AddRootParameter(D3D12_ROOT_PARAMETER_TYPE_SRV, 1 /*t1*/); // indices
 	rsc.AddRootParameter(D3D12_ROOT_PARAMETER_TYPE_SRV);
 	return rsc.Generate(m_device.Get(), true);
 }
@@ -1050,8 +1049,7 @@ void RevEngineMain::CreateShaderBindingTable()
 	{
 		m_sbtHelper.AddHitGroup(
             L"HitGroup",
-            {reinterpret_cast<void*>(m_perInstanceConstantBuffers[i]->GetGPUVirtualAddress()),
-            	reinterpret_cast<void*>(m_indexBuffer->GetGPUVirtualAddress())
+            {reinterpret_cast<void*>(m_perInstanceConstantBuffers[i]->GetGPUVirtualAddress())
             });
 	}
 
