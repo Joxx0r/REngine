@@ -2,6 +2,11 @@
 
 struct RevInputState
 {
+    int m_x;
+    int m_y;
+    int m_startX;
+    int m_startY;
+    
     bool m_leftButton;
     bool m_middleButton;
     bool m_rightButton;
@@ -14,16 +19,4 @@ struct RevInputState
     bool m_down;
     bool m_forward;
     bool m_back;
-    int m_x;
-    int m_y;
-
-    int m_startX;
-    int m_startY;
-    
-};
-
-struct Vertex
-{
-    XMFLOAT3 position;
-    XMFLOAT4 color;
 };

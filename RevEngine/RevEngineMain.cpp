@@ -18,6 +18,7 @@
 #include "Windowsx.h"
 #include "Core/RevInstanceManager.h"
 #include "Core/RevModelManager.h"
+#include "Core/RevModelTypes.h"
 
 RevEngineMain::RevEngineMain(const UINT width, const UINT height,const std::wstring name)
 :     m_width(width),
@@ -394,17 +395,12 @@ void RevEngineMain::PopulateCommandList() const
 		m_commandList->SetGraphicsRootDescriptorTable(
           0, m_constHeap->GetGPUDescriptorHandleForHeapStart());
 
-		
 		const float clearColor[] = {0.0f, 0.2f, 0.4f, 1.0f};
 		m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-		m_commandList->IASetVertexBuffers(0, 1, &m_triangleModel.m_vertexBufferView);
-		m_commandList->IASetIndexBuffer(&m_triangleModel.m_indexBufferView);
-		m_commandList->DrawIndexedInstanced(12, 1, 0, 0, 0);
-		// #DXR Extra: Per-Instance Data
-		// In a way similar to triangle rendering, rasterize the plane
-	//	m_commandList->IASetVertexBuffers(0, 1, &m_planeBufferView);
-	//	m_commandList->DrawInstanced(6, 1, 0, 0);
+		m_triangleModel.DrawRasterized(m_commandList.Get());
+		m_commandList->IASetVertexBuffers(0, 1, &m_triangleModel.m_baseData.m_d3dData.m_vertexBufferView);
+		m_commandList->IASetIndexBuffer(&m_triangleModel.m_baseData.m_d3dData.m_indexBufferView);
 	}
 	else
 	{

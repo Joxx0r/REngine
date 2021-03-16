@@ -118,6 +118,8 @@
     <ClInclude Include="Core\RevInstanceManager.h" />
     <ClInclude Include="Core\RevModel.h" />
     <ClInclude Include="Core\RevModelManager.h" />
+    <ClInclude Include="Core\RevModelTypes.h" />
+    <ClInclude Include="D3D\RevD3DTypes.h" />
     <ClInclude Include="RevEngineMain.h" />
     <ClInclude Include="DXRHelper.h" />
     <ClInclude Include="Misc\RevTypes.h" />
@@ -533,6 +535,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="D3D\RevD3DTypes.cpp" />
     <ClCompile Include="RevEngineMain.cpp" />
     <ClCompile Include="RaytracingPipelineGenerator.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
