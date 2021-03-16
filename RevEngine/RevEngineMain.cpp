@@ -297,7 +297,7 @@ void RevEngineMain::LoadAssets()
 			{{-std::sqrtf(2.f / 9.f), -std::sqrtf(2.f / 3.f), -1.f / 3.f}, {0.f, 0.f, 1.f, 1.f}},
 			{{0.f, 0.f, 1.f}, {1, 0, 1, 1}}};
 
-		const UINT vertexBufferSize = sizeof(Vertex) * m_vertexes.size();
+		const UINT vertexBufferSize = sizeof(Vertex) * static_cast<UINT>(m_vertexes.size());
 
 		// Note: using upload heaps to transfer static data like vert buffers is not
 		// recommended. Every time the GPU needs it, the upload heap will be
@@ -616,7 +616,7 @@ void RevEngineMain::OnMouseMove(UINT8 wParam, UINT32 lParam)
 	{
 		int deltaX = m_input.m_startX - m_input.m_x;
 		int deltaY = m_input.m_y - m_input.m_startY;
-		m_camera.OnMoveDelta(deltaX, deltaY);
+		m_camera.OnMoveDelta(static_cast<float>(deltaX), static_cast<float>(deltaY));
 		m_input.m_startX = m_input.m_x;
 		m_input.m_startY = m_input.m_y;
 	}
