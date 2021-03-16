@@ -38,14 +38,6 @@ class RevModelManager;
 #define idxcblob IDxcBlob
 #define id3d12descriptorheap ID3D12DescriptorHeap
 
-
-struct AccelerationStructureBuffers
-{
-    ComPtr<ID3D12Resource> pScratch;      // Scratch memory for AS builder
-    ComPtr<ID3D12Resource> pResult;       // Where the AS is
-    ComPtr<ID3D12Resource> pInstanceDesc; // Hold the matrices of the instances
-};
-
 class RevEngineMain
 {
 public:

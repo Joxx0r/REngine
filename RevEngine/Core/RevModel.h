@@ -9,6 +9,14 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
+struct AccelerationStructureBuffers
+{
+    ComPtr<ID3D12Resource> pScratch;      // Scratch memory for AS builder
+    ComPtr<ID3D12Resource> pResult;       // Where the AS is
+    ComPtr<ID3D12Resource> pInstanceDesc; // Hold the matrices of the instances
+};
+
+
 class RevModel
 {
     
@@ -17,6 +25,7 @@ public:
 
     void Initialize(int type, ID3D12Device5* device);
 
+    AccelerationStructureBuffers CreateStructureBuffer(ID3D12Device5* device,ID3D12GraphicsCommandList4* list);
     ComPtr<ID3D12Resource> m_vertexBuffer;
     D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
 

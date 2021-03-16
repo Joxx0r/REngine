@@ -716,11 +716,8 @@ void RevEngineMain::CreateTopLevelAS(
 void RevEngineMain::CreateAccelerationStructures()
 {
 	// Build the bottom AS from the Triangle vertex buffer
-	AccelerationStructureBuffers bottomLevelBuffers =
-		CreateBottomLevelAS({{m_triangleModel.m_vertexBuffer.Get(), m_triangleModel.m_vertexes.size()}},
-			{{m_triangleModel.m_indexBuffer.Get(), m_indices.size()}});
-	AccelerationStructureBuffers planeBottomLevelBuffers =
-	CreateBottomLevelAS({{m_planeModel.m_vertexBuffer.Get(), 6}});
+	AccelerationStructureBuffers bottomLevelBuffers = m_triangleModel.CreateStructureBuffer(m_device.Get(), m_commandList.Get());
+	AccelerationStructureBuffers planeBottomLevelBuffers = m_planeModel.CreateStructureBuffer(m_device.Get(), m_commandList.Get());
 
 	// Just one instance for now
 	
