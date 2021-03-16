@@ -171,9 +171,10 @@ public:
     void CreatePerInstanceConstantBuffers();
     std::vector<ComPtr<id3d12resource>> m_perInstanceConstantBuffers;
 
-    // #DXR Extra: Per-Instance Data
-    void CreateGlobalConstantBuffer();
-    ComPtr<id3d12resource> m_globalConstantBuffer;
+    // #DXR Extra: Depth Buffering
+    void CreateDepthBuffer();
+    ComPtr< ID3D12DescriptorHeap > m_dsvHeap;
+    ComPtr< ID3D12Resource > m_depthStencil;
 
     UINT GetWidth() const           { return m_width; }
     UINT GetHeight() const          { return m_height; }
