@@ -79,6 +79,7 @@ public:
     D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
 
     std::vector<Vertex> m_vertexes;
+    std::vector<UINT> m_indices; 
 
     // Synchronization objects.
     UINT m_frameIndex;
@@ -108,7 +109,8 @@ public:
     /// \param     vVertexBuffers : pair of buffer and vertex count
     /// \return    AccelerationStructureBuffers for TLAS
     AccelerationStructureBuffers
-    CreateBottomLevelAS(std::vector<std::pair<ComPtr<id3d12resource>, uint32_t>> vVertexBuffers) const;
+    CreateBottomLevelAS(std::vector<std::pair<ComPtr<id3d12resource>, uint32_t>> vVertexBuffers,
+        std::vector<std::pair<ComPtr<id3d12resource>, uint32_t>> vIndexBuffers = {}) const;
 
     /// Create the main acceleration structure that holds
     /// all instances of the scene
@@ -203,6 +205,9 @@ private:
 
     // Window title.
     std::wstring m_title;
+
+    ComPtr<id3d12resource> m_indexBuffer;
+    D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
     
 };
 

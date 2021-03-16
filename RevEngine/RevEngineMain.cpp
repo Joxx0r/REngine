@@ -285,13 +285,10 @@ void RevEngineMain::LoadAssets()
 	{
 		// Define the geometry for a triangle.
 		m_vertexes = {
-			{{0.0f, 0.25f * m_aspectRatio, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
-			{{0.25f, -0.25f * m_aspectRatio, 0.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
-			{{-0.25f, -0.25f * m_aspectRatio, 0.0f}, {1.0f, 0.0f, 1.0f, 1.0f}},
-			{{1.25f, 1.25f * m_aspectRatio, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
-			{{1.25f, 0.75f * m_aspectRatio, 0.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
-			{{0.75f, 0.75f * m_aspectRatio, 0.0f}, {1.0f, 0.0f, 1.0f, 1.0f}}
-		};
+			{{std::sqrtf(8.f / 9.f), 0.f, -1.f / 3.f}, {1.f, 0.f, 0.f, 1.f}},
+			{{-std::sqrtf(2.f / 9.f), std::sqrtf(2.f / 3.f), -1.f / 3.f}, {0.f, 1.f, 0.f, 1.f}},
+			{{-std::sqrtf(2.f / 9.f), -std::sqrtf(2.f / 3.f), -1.f / 3.f}, {0.f, 0.f, 1.f, 1.f}},
+			{{0.f, 0.f, 1.f}, {1, 0, 1, 1}}};
 
 		const UINT vertexBufferSize = sizeof(Vertex) * m_vertexes.size();
 
@@ -323,6 +320,31 @@ void RevEngineMain::LoadAssets()
 		m_vertexBufferView.SizeInBytes = vertexBufferSize;
 	}
 
+	{
+		//----------------------------------------------------------------------------------------------
+		// Indices
+		m_indices = {0, 1, 2, 0, 3, 1, 0, 2, 3, 1, 3, 2};
+		const UINT indexBufferSize = static_cast<UINT>(m_indices.size()) * sizeof(UINT);
+
+		CD3DX12_HEAP_PROPERTIES heapProperty = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+		CD3DX12_RESOURCE_DESC bufferResource = CD3DX12_RESOURCE_DESC::Buffer(indexBufferSize);
+		ThrowIfFailed(m_device->CreateCommittedResource(
+            &heapProperty, D3D12_HEAP_FLAG_NONE, &bufferResource, //
+            D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_indexBuffer)));
+
+		// Copy the triangle data to the index buffer.
+		UINT8* pIndexDataBegin;
+		CD3DX12_RANGE readRange(
+        0, 0); // We do not intend to read from this resource on the CPU.
+		ThrowIfFailed(m_indexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pIndexDataBegin)));
+		memcpy(pIndexDataBegin, m_indices.data(), indexBufferSize);
+		m_indexBuffer->Unmap(0, nullptr);
+
+		// Initialize the index buffer view.
+		m_indexBufferView.BufferLocation = m_indexBuffer->GetGPUVirtualAddress();
+		m_indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+		m_indexBufferView.SizeInBytes = indexBufferSize;
+	}
 	// Create synchronization objects and wait until assets have been uploaded to
 	// the GPU.
 	{
@@ -421,7 +443,8 @@ void RevEngineMain::PopulateCommandList() const
 		m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 		m_commandList->IASetVertexBuffers(0, 1, &m_vertexBufferView);
-		m_commandList->DrawInstanced(3, 1, 0, 0);
+		m_commandList->IASetIndexBuffer(&m_indexBufferView);
+		m_commandList->DrawIndexedInstanced(12, 1, 0, 0, 0);
 		// #DXR Extra: Per-Instance Data
 		// In a way similar to triangle rendering, rasterize the plane
 	//	m_commandList->IASetVertexBuffers(0, 1, &m_planeBufferView);
@@ -615,15 +638,28 @@ void RevEngineMain::UpdateInput(float delta)
 //
 AccelerationStructureBuffers
 RevEngineMain::CreateBottomLevelAS(
-	std::vector<std::pair<ComPtr<ID3D12Resource>, uint32_t>> vVertexBuffers) const
+	std::vector<std::pair<ComPtr<ID3D12Resource>, uint32_t>> vVertexBuffers, 
+        std::vector<std::pair<ComPtr<id3d12resource>, uint32_t>> vIndexBuffers) const
 {
 	nv_helpers_dx12::BottomLevelASGenerator bottomLevelAS;
 
 	// Adding all vertex buffers and not transforming their position.
-	for (const auto& buffer : vVertexBuffers)
+	for (int i = 0; i < vVertexBuffers.size(); i++)
 	{
-		bottomLevelAS.AddVertexBuffer(buffer.first.Get(), 0, buffer.second,
-		                              sizeof(Vertex), nullptr, 0);
+		// for (const auto &buffer : vVertexBuffers) {
+		if (i < vIndexBuffers.size() && vIndexBuffers[i].second > 0)
+		{
+			bottomLevelAS.AddVertexBuffer(vVertexBuffers[i].first.Get(), 0,
+                                  vVertexBuffers[i].second, sizeof(Vertex),
+                                  vIndexBuffers[i].first.Get(), 0,
+                                  vIndexBuffers[i].second, nullptr, 0, true);	
+		}
+		else
+		{
+			bottomLevelAS.AddVertexBuffer(vVertexBuffers[i].first.Get(), 0,
+                                          vVertexBuffers[i].second, sizeof(Vertex), 0,
+                                          0);		
+		}
 	}
 
 	// The AS build requires some scratch space to store temporary information.
@@ -725,7 +761,8 @@ void RevEngineMain::CreateAccelerationStructures()
 {
 	// Build the bottom AS from the Triangle vertex buffer
 	AccelerationStructureBuffers bottomLevelBuffers =
-		CreateBottomLevelAS({{m_vertexBuffer.Get(), m_vertexes.size()}});
+		CreateBottomLevelAS({{m_vertexBuffer.Get(), m_vertexes.size()}},
+			{{m_indexBuffer.Get(), m_indices.size()}});
 	AccelerationStructureBuffers planeBottomLevelBuffers =
 	CreateBottomLevelAS({{m_planeBuffer.Get(), 6}});
 
@@ -783,6 +820,7 @@ ComPtr<id3d12rootsignature> RevEngineMain::CreateHitSignature() const
 {
 	nv_helpers_dx12::RootSignatureGenerator rsc;
 	rsc.AddRootParameter(D3D12_ROOT_PARAMETER_TYPE_CBV, 0);
+	rsc.AddRootParameter(D3D12_ROOT_PARAMETER_TYPE_SRV, 1 /*t1*/); // indices
 	rsc.AddRootParameter(D3D12_ROOT_PARAMETER_TYPE_SRV);
 	return rsc.Generate(m_device.Get(), true);
 }
@@ -1012,7 +1050,9 @@ void RevEngineMain::CreateShaderBindingTable()
 	{
 		m_sbtHelper.AddHitGroup(
             L"HitGroup",
-            {reinterpret_cast<void*>(m_perInstanceConstantBuffers[i]->GetGPUVirtualAddress())});
+            {reinterpret_cast<void*>(m_perInstanceConstantBuffers[i]->GetGPUVirtualAddress()),
+            	reinterpret_cast<void*>(m_indexBuffer->GetGPUVirtualAddress())
+            });
 	}
 
 	// #DXR Extra: Per-Instance Data
