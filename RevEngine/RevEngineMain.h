@@ -15,6 +15,8 @@
 #include "TopLevelASGenerator.h"
 #include "ShaderBindingTableGenerator.h"
 #include "Core/RevCamera.h"
+#include "Core/RevModel.h"
+#include "Core/RevModelManager.h"
 #include "Misc/RevTypes.h"
 
 using namespace DirectX;
@@ -25,6 +27,9 @@ using namespace DirectX;
 // referenced by the GPU.
 // An example of this can be found in the class method: OnDestroy().
 using Microsoft::WRL::ComPtr;
+
+class RevInstanceManager;
+class RevModelManager;
 
 #define id3d12resource ID3D12Resource
 #define id3d12rootsignature ID3D12RootSignature
@@ -53,11 +58,6 @@ public:
 
     static const UINT FrameCount = 2;
 
-    struct Vertex
-    {
-        XMFLOAT3 position;
-        XMFLOAT4 color;
-    };
 
     // Pipeline objects.
     CD3DX12_VIEWPORT m_viewport;
@@ -74,11 +74,6 @@ public:
     UINT m_rtvDescriptorSize;
     bool m_raster = false;
 
-    // App resources.
-    ComPtr<ID3D12Resource> m_vertexBuffer;
-    D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
-
-    std::vector<Vertex> m_vertexes;
     std::vector<UINT> m_indices; 
 
     // Synchronization objects.
@@ -153,11 +148,6 @@ public:
     nv_helpers_dx12::ShaderBindingTableGenerator m_sbtHelper;
     ComPtr<id3d12resource> m_sbtStorage;
 
-    // #DXR Extra: Per-Instance Data
-    ComPtr<id3d12resource> m_planeBuffer;
-    D3D12_VERTEX_BUFFER_VIEW m_planeBufferView;
-    void CreatePlaneVB();
-
     // #DXR Extra: Perspective Camera
     void CreateCameraBuffer();
     void UpdateCameraBuffer();
@@ -207,8 +197,11 @@ private:
     // Window title.
     std::wstring m_title;
 
-    ComPtr<id3d12resource> m_indexBuffer;
-    D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
+    RevInstanceManager* m_instanceManager;
+    RevModelManager* m_modelManager;
+
+    RevModel m_triangleModel = {};
+    RevModel m_planeModel = {};
     
 };
 
