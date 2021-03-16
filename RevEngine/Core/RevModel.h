@@ -20,4 +20,6 @@ public:
            ID3D12Device5* device, ID3D12GraphicsCommandList4* list); 
     
     RevVertIndexData m_baseData;
+
+    int m_type;
 };

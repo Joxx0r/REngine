@@ -45,8 +45,7 @@ void RevEngineMain::OnInit()
 {	
 	LoadPipeline();
 	LoadAssets();
-
-	m_planeModel.Initialize(1, m_device.Get());
+	m_modelManager->LoadModel(m_device.Get(), 1, m_planeModel);
 	// Check the raytracing capabilities of the device
 	CheckRaytracingSupport();
 
@@ -295,7 +294,7 @@ void RevEngineMain::LoadAssets()
 
 	// Create the vertex buffer.
 	{
-		m_triangleModel.Initialize(0, m_device.Get());
+		m_modelManager->LoadModel(m_device.Get(), 0, m_triangleModel);
 	}
 	// Create synchronization objects and wait until assets have been uploaded to
 	// the GPU.

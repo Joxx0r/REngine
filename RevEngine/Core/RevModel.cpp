@@ -5,6 +5,7 @@
 
 void RevModel::Initialize(int type, ID3D12Device5* device)
 {
+	m_type = type;
     if(type == 0)
     {
     	RevVertInitializationData initData = {};
