@@ -21,21 +21,15 @@
 #include "Core/RevModelTypes.h"
 
 RevEngineMain::RevEngineMain(const UINT width, const UINT height,const std::wstring name)
-:     m_width(width),
+: m_width(width),
 m_height(height),
-m_title(name),
-m_useWarpDevice(false)
-,m_viewport(0.0f, 0.0f, static_cast<float>(width),
-	             static_cast<float>(height)),
-	  m_scissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height)),
-	  m_rtvDescriptorSize(0)
+m_title(name)
+,m_viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)),  m_scissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height)), m_rtvDescriptorSize(0)
 {
 	WCHAR assetsPath[512];
 	GetAssetsPath(assetsPath, _countof(assetsPath));
 	m_assetsPath = assetsPath;
-
 	m_aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-	
 	m_camera.Initialize(m_aspectRatio);
 	m_instanceManager = new RevInstanceManager();
 	m_modelManager = new RevModelManager();
@@ -46,40 +40,15 @@ void RevEngineMain::OnInit()
 	LoadPipeline();
 	LoadAssets();
 	m_modelManager->LoadModel(m_device.Get(), 1, m_planeModel);
-	// Check the raytracing capabilities of the device
 	CheckRaytracingSupport();
-
-	// Setup the acceleration structures (AS) for raytracing. When setting up
-	// geometry, each bottom-level AS has its own transform matrix.
 	CreateAccelerationStructures();
-
-	// Command lists are created in the recording state, but there is
-	// nothing to record yet. The main loop expects it to be closed, so close it now.
 	ThrowIfFailed(m_commandList->Close());
-
-	// Create the raytracing pipeline, associating the shader code to symbol names
-	// and to their root signatures, and defining the amount of memory carried by
-	// rays (ray payload)
 	CreateRaytracingPipeline();
-
 	CreatePerInstanceConstantBuffers();
-
-	// Allocate the buffer storing the raytracing output, with the same dimensions
-	// as the target image
 	CreateRaytracingOutputBuffer();
-
 	CreateCameraBuffer();
-
-	// Create the buffer containing the raytracing result (always output in a
-	// UAV), and create the heap referencing the resources used by the raytracing,
-	// such as the acceleration structure
 	CreateShaderResourceHeap();
-
-	// Create the shader binding table and indicating which shaders
-	// are invoked for each instance in the  AS
 	CreateShaderBindingTable();
-
-	//need to update before end of init
 	m_camera.Update(0.0f, m_input);
 	UpdateCameraBuffer();
 }
@@ -107,26 +76,12 @@ void RevEngineMain::LoadPipeline()
 
 	ComPtr<IDXGIFactory4> factory;
 	ThrowIfFailed(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&factory)));
+	ComPtr<IDXGIAdapter1> hardwareAdapter;
+	GetHardwareAdapter(factory.Get(), &hardwareAdapter);
 
-	if (m_useWarpDevice)
-	{
-		ComPtr<IDXGIAdapter> warpAdapter;
-		ThrowIfFailed(factory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter)));
-
-		ThrowIfFailed(D3D12CreateDevice(warpAdapter.Get(),
-		                                D3D_FEATURE_LEVEL_12_1,
-		                                IID_PPV_ARGS(&m_device)));
-	}
-	else
-	{
-		ComPtr<IDXGIAdapter1> hardwareAdapter;
-		GetHardwareAdapter(factory.Get(), &hardwareAdapter);
-
-		ThrowIfFailed(D3D12CreateDevice(hardwareAdapter.Get(),
-		                                D3D_FEATURE_LEVEL_12_1,
-		                                IID_PPV_ARGS(&m_device)));
-	}
-
+	ThrowIfFailed(D3D12CreateDevice(hardwareAdapter.Get(),
+	                                D3D_FEATURE_LEVEL_12_1,
+	                                IID_PPV_ARGS(&m_device)));
 	// Describe and create the command queue.
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
@@ -1218,19 +1173,4 @@ void RevEngineMain::GetHardwareAdapter(
     }
     
     *ppAdapter = adapter.Detach();
-}
-
-// Helper function for parsing any supplied command line args.
-_Use_decl_annotations_
-void RevEngineMain::ParseCommandLineArgs(WCHAR* argv[], int argc)
-{
-	for (int i = 1; i < argc; ++i)
-	{
-		if (_wcsnicmp(argv[i], L"-warp", wcslen(argv[i])) == 0 || 
-            _wcsnicmp(argv[i], L"/warp", wcslen(argv[i])) == 0)
-		{
-			m_useWarpDevice = true;
-			m_title = m_title + L" (WARP)";
-		}
-	}
 }

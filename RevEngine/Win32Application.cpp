@@ -17,12 +17,6 @@ HWND Win32Application::m_hwnd = nullptr;
 
 int Win32Application::Run(RevEngineMain* pSample, HINSTANCE hInstance, int nCmdShow)
 {
-    // Parse the command line parameters
-    int argc;
-    LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-    pSample->ParseCommandLineArgs(argv, argc);
-    LocalFree(argv);
-
     // Initialize the window class.
     WNDCLASSEX windowClass = { 0 };
     windowClass.cbSize = sizeof(WNDCLASSEX);
