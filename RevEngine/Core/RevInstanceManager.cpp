@@ -10,10 +10,10 @@ void RevInstanceManager::Initialize(RevModelManager* modelManager)
     m_modelManager = modelManager;
 }
 
-void RevInstanceManager::AddInstance(int type,  DirectX::XMMATRIX transform)
+void RevInstanceManager::AddInstance(RevEModelType desiredType,  DirectX::XMMATRIX transform)
 {
     RevInstance* newInstance = new RevInstance();
-    newInstance->Initialize(m_modelManager, type, transform);
+    newInstance->Initialize(m_modelManager, desiredType, transform);
     m_instances.push_back(newInstance);
 }
 void RevInstanceManager::AddAllInstancesToSBT(nv_helpers_dx12::TopLevelASGenerator* generator)

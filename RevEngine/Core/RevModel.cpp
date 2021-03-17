@@ -5,11 +5,11 @@
 #include "RevModelTypes.h"
 #include "../BottomLevelASGenerator.h"
 
-void RevModel::Initialize(int type, REV_ID_HANDLE handle, ID3D12Device5* device)
+void RevModel::Initialize(RevEModelType type, REV_ID_HANDLE handle, ID3D12Device5* device)
 {
 	m_type = type;
 	m_handle = handle;
-    if(type == 0)
+    if(type == RevEModelType::Triangle)
     {
     	RevVertInitializationData initData = {};
     	initData.m_device = device;
@@ -26,8 +26,8 @@ void RevModel::Initialize(int type, REV_ID_HANDLE handle, ID3D12Device5* device)
         }
     	m_baseData = RevVertIndexData::Create(initData);
     }
-	
     else
+    if(type == RevEModelType::Plane)
     {
     	RevVertInitializationData initData = {};
     	initData.m_device = device;
@@ -44,6 +44,10 @@ void RevModel::Initialize(int type, REV_ID_HANDLE handle, ID3D12Device5* device)
 	    }
     	m_baseData = RevVertIndexData::Create(initData);
     }
+	else
+	{
+		assert(false);
+	}
 }
 void RevModel::DrawRasterized(ID3D12GraphicsCommandList4* list) const
 {

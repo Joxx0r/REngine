@@ -109,8 +109,7 @@ public:
     /// \param     instances : pair of BLAS and transform
     void CreateTopLevelAS(
         const std::vector<std::pair<ComPtr<id3d12resource>, DirectX::XMMATRIX>>& instances);
-    void CreateTopLevelAS(
-        const std::vector<RevInstance*>& instances);
+    void CreateTopLevelAS();
 
     /// Create all acceleration structures, bottom and top
     void CreateAccelerationStructures();

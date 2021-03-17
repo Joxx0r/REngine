@@ -736,12 +736,11 @@ void RevEngineMain::CreateTopLevelAS()
 //
 void RevEngineMain::CreateAccelerationStructures()
 {
-
 	// Just one instance for now
-	m_instanceManager->AddInstance(0,  XMMatrixTranslation(.6f, 0, 0));
-	m_instanceManager->AddInstance(0, XMMatrixTranslation(-.6f, 0, 0));
-	m_instanceManager->AddInstance(0,  XMMatrixTranslation(0, 0, 0));
-	m_instanceManager->AddInstance(1,  XMMatrixTranslation(0, 0, 0));
+	m_instanceManager->AddInstance(RevEModelType::Triangle,  XMMatrixTranslation(.6f, 0, 0));
+	m_instanceManager->AddInstance(RevEModelType::Triangle, XMMatrixTranslation(-.6f, 0, 0));
+	m_instanceManager->AddInstance(RevEModelType::Triangle,  XMMatrixTranslation(0, 0, 0));
+	m_instanceManager->AddInstance(RevEModelType::Plane,  XMMatrixTranslation(0, 0, 0));
 	
 	// Build the bottom AS from the Triangle vertex buffer
 	m_modelManager->GenerateAccelerationBuffersAllModels();

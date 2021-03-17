@@ -2,10 +2,10 @@
 #include "RevInstance.h"
 #include "RevModel.h"
 
-void RevInstance::Initialize(RevModelManager* manager,int modelType, DirectX::XMMATRIX transform)
+void RevInstance::Initialize(RevModelManager* manager,RevEModelType desiredType, DirectX::XMMATRIX transform)
 {
    m_modelManager = manager;
-   m_modelHandle = m_modelManager->FindModelHandleFromType(modelType);
+   m_modelHandle = m_modelManager->FindModelHandleFromType(desiredType);
    m_transform = transform;
 }
 

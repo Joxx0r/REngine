@@ -5,12 +5,13 @@
 #include "RevCoreDefines.h"
 #include "RevModelManager.h"
 
+enum RevEModelType : UINT8;
 class RevInstance
 {
 public:
     RevInstance() {};
 
-    void Initialize(RevModelManager* manager,  int modelType, DirectX::XMMATRIX transform);
+    void Initialize(RevModelManager* manager,  RevEModelType desiredType, DirectX::XMMATRIX transform);
     void DrawInstance(ID3D12GraphicsCommandList4* list);
 
     DirectX::XMMATRIX m_transform;

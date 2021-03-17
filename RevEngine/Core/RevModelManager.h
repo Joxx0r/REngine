@@ -3,15 +3,16 @@
 #include "RevCoreDefines.h"
 #include "RevEngineManager.h"
 
+enum RevEModelType : UINT8;
 class RevModel;
 
 class RevModelManager : public RevEngineManager
 {
 public:
     RevModelManager() {};
-    RevModel* FindModel(int type, bool loadIfNotFound = true);
+    RevModel* FindModel(RevEModelType desiredType, bool loadIfNotFound = true);
     RevModel* FindModelFromHandle(int handle);
-    REV_ID_HANDLE FindModelHandleFromType(int type, bool loadIfNotFound = true);
+    REV_ID_HANDLE FindModelHandleFromType(RevEModelType desiredType, bool loadIfNotFound = true);
 
     void GenerateAccelerationBuffersAllModels();
 

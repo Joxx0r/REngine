@@ -4,12 +4,12 @@
 #include "RevCoreDefines.h"
 #include "RevModel.h"
 
-RevModel* RevModelManager::FindModel(int type, bool loadIfNotFound /*= true*/)
+RevModel* RevModelManager::FindModel(RevEModelType desiredType, bool loadIfNotFound /*= true*/)
 {
     for(int index = 0; index < m_models.size(); index++)
     {
         assert(m_models[index]);
-        if(m_models[index]->m_type == type)
+        if(m_models[index]->m_type == desiredType)
         {
             return m_models[index];
         }
@@ -19,7 +19,7 @@ RevModel* RevModelManager::FindModel(int type, bool loadIfNotFound /*= true*/)
     {
         RevModel* model = new RevModel();
         m_modelCounter++;
-        model->Initialize(type, m_modelCounter, m_device);
+        model->Initialize(desiredType, m_modelCounter, m_device);
         m_models.push_back(model);
         return model;
     }
@@ -40,12 +40,12 @@ RevModel* RevModelManager::FindModelFromHandle( int handle)
     return nullptr;
 }
 
-REV_ID_HANDLE RevModelManager::FindModelHandleFromType( int type, bool loadIfNotFound)
+REV_ID_HANDLE RevModelManager::FindModelHandleFromType( RevEModelType desiredType, bool loadIfNotFound)
 {
     for(int index = 0; index < m_models.size(); index++)
     {
         assert(m_models[index]);
-        if(m_models[index]->m_type == type)
+        if(m_models[index]->m_type == desiredType)
         {
             return m_models[index]->m_handle;
         }
@@ -55,7 +55,7 @@ REV_ID_HANDLE RevModelManager::FindModelHandleFromType( int type, bool loadIfNot
     {
         RevModel* model = new RevModel();
         m_modelCounter++;
-        model->Initialize(type,m_modelCounter, m_device);
+        model->Initialize(desiredType,m_modelCounter, m_device);
         m_models.push_back(model);
         return model->m_handle;
     }
