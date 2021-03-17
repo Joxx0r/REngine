@@ -21,6 +21,7 @@ public:
            ID3D12Device5* device, ID3D12GraphicsCommandList4* list); 
     
     RevVertIndexData m_baseData;
+    AccelerationStructureBuffers m_relevantBuffers;
 
     int m_type;
     REV_ID_HANDLE m_handle = REV_INDEX_NONE;

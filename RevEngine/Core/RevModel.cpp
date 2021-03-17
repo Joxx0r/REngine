@@ -72,5 +72,6 @@ void RevModel::DrawRasterized(ID3D12GraphicsCommandList4* list) const
 
 AccelerationStructureBuffers RevModel::CreateStructureBuffer(ID3D12Device5* device, ID3D12GraphicsCommandList4* list)
 {
-	return RevVertIndexData::CreateAccelerationStructure(m_baseData, device, list);
+	m_relevantBuffers =  RevVertIndexData::CreateAccelerationStructure(m_baseData, device, list);
+	return m_relevantBuffers;
 }

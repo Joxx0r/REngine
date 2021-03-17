@@ -2,9 +2,8 @@
 #include "RevInstance.h"
 #include "RevModel.h"
 
-void RevInstance::Initialize(RevModelManager* manager,int modelType, DirectX::XMMATRIX transform,   Microsoft::WRL::ComPtr<ID3D12Resource> resource)
+void RevInstance::Initialize(RevModelManager* manager,int modelType, DirectX::XMMATRIX transform)
 {
-   m_resource = resource;
    m_modelManager = manager;
    m_modelHandle = m_modelManager->FindModelHandleFromType(modelType);
    m_transform = transform;

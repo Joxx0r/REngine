@@ -67,6 +67,12 @@ void RevEngineMain::OnInit()
 {	
 	LoadPipeline();
 	LoadAssets();
+	//we initialize managers here for d3d
+	for (RevEngineManager* manager : m_managers)
+	{
+		assert(manager);
+		manager->InitializeGraphics(m_device.Get(), m_commandList.Get());
+	}
 	CheckRaytracingSupport();
 	CreateAccelerationStructures();
 	ThrowIfFailed(m_commandList->Close());
@@ -178,13 +184,6 @@ void RevEngineMain::LoadPipeline()
 	// The original sample does not support depth buffering, so we need to allocate a depth buffer,
 	// and later bind it before rasterization
 	CreateDepthBuffer();
-
-	//we initialize managers here for d3d
-	for (RevEngineManager* manager : m_managers)
-	{
-		assert(manager);
-		manager->InitializeGraphics(m_device.Get());
-	}
 }
 
 // Load the sample assets.
@@ -686,14 +685,10 @@ void RevEngineMain::CreateTopLevelAS(
 	                               m_topLevelASBuffers.pResult.Get(),
 	                               m_topLevelASBuffers.pInstanceDesc.Get());
 }
-void RevEngineMain::CreateTopLevelAS(const std::vector<RevInstance*>& instances)
+void RevEngineMain::CreateTopLevelAS()
 {
 		// Gather all the instances into the builder helper
-	for (size_t i = 0; i < instances.size(); i++)
-	{
-		m_topLevelASGenerator.AddInstance(instances[i]->m_resource.Get(), instances[i]->m_transform,
-                                          static_cast<UINT>(i), static_cast<UINT>(i));
-	}
+	m_instanceManager->AddAllInstancesToSBT(&m_topLevelASGenerator);
 
 	// As for the bottom-level AS, the building the AS requires some scratch space
 	// to store temporary data in addition to the actual AS. In the case of the
@@ -741,20 +736,16 @@ void RevEngineMain::CreateTopLevelAS(const std::vector<RevInstance*>& instances)
 //
 void RevEngineMain::CreateAccelerationStructures()
 {
-	// Build the bottom AS from the Triangle vertex buffer
-	AccelerationStructureBuffers bottomLevelBuffers = m_modelManager->FindModel( 0)->CreateStructureBuffer(m_device.Get(), m_commandList.Get());
-	AccelerationStructureBuffers planeBottomLevelBuffers =  m_modelManager->FindModel( 1)->CreateStructureBuffer(m_device.Get(), m_commandList.Get());
 
 	// Just one instance for now
-	RevInstance* instance1 = new RevInstance();
-	RevInstance* instance2 = new RevInstance();
-	RevInstance* instance3 = new RevInstance();
-
-	m_instanceManager->AddInstance(0,  bottomLevelBuffers.pResult, XMMatrixTranslation(.6f, 0, 0));
-	m_instanceManager->AddInstance(0,  bottomLevelBuffers.pResult, XMMatrixTranslation(-.6f, 0, 0));
-	m_instanceManager->AddInstance(0,  bottomLevelBuffers.pResult, XMMatrixTranslation(0, 0, 0));
-	m_instanceManager->AddInstance(1,  planeBottomLevelBuffers.pResult, XMMatrixTranslation(0, 0, 0));
-	CreateTopLevelAS(m_instanceManager->m_instances);
+	m_instanceManager->AddInstance(0,  XMMatrixTranslation(.6f, 0, 0));
+	m_instanceManager->AddInstance(0, XMMatrixTranslation(-.6f, 0, 0));
+	m_instanceManager->AddInstance(0,  XMMatrixTranslation(0, 0, 0));
+	m_instanceManager->AddInstance(1,  XMMatrixTranslation(0, 0, 0));
+	
+	// Build the bottom AS from the Triangle vertex buffer
+	m_modelManager->GenerateAccelerationBuffersAllModels();
+	CreateTopLevelAS();
 
 	// Flush the command list and wait for it to finish
 	m_commandList->Close();
@@ -770,10 +761,6 @@ void RevEngineMain::CreateAccelerationStructures()
 	// rendering
 	ThrowIfFailed(
 		m_commandList->Reset(m_commandAllocator.Get(), m_pipelineState.Get()));
-
-	// Store the AS buffers. The rest of the buffers will be released once we exit
-	// the function
-	m_bottomLevelAS = bottomLevelBuffers.pResult;
 }
 
 //-----------------------------------------------------------------------------

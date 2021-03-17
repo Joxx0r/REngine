@@ -63,3 +63,11 @@ REV_ID_HANDLE RevModelManager::FindModelHandleFromType( int type, bool loadIfNot
     return -1;
     
 }
+void RevModelManager::GenerateAccelerationBuffersAllModels()
+{
+    for(int index = 0; index < m_models.size(); index++)
+    {
+        assert(m_models[index]);
+        m_models[index]->CreateStructureBuffer(m_device, m_list);
+    }
+}
