@@ -15,6 +15,7 @@
 #include "TopLevelASGenerator.h"
 #include "ShaderBindingTableGenerator.h"
 #include "Core/RevCamera.h"
+#include "Core/RevEngineManager.h"
 #include "Core/RevInstance.h"
 #include "Core/RevModel.h"
 #include "Core/RevModelManager.h"
@@ -79,7 +80,6 @@ public:
 
     nv_helpers_dx12::TopLevelASGenerator m_topLevelASGenerator;
     AccelerationStructureBuffers m_topLevelASBuffers;
-    std::vector<std::pair<ComPtr<ID3D12Resource>, DirectX::XMMATRIX>> m_instances;
     std::vector<RevInstance*> m_revInstances;
 
     void LoadPipeline();
@@ -190,6 +190,6 @@ private:
 
     RevInstanceManager* m_instanceManager;
     RevModelManager* m_modelManager;
-
+    std::vector<RevEngineManager*> m_managers;
 };
 

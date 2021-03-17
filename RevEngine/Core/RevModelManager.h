@@ -1,14 +1,16 @@
 ﻿#pragma once
 
+#include "RevEngineManager.h"
+
 class RevModel;
 
-class RevModelManager
+class RevModelManager : public RevEngineManager
 {
 public:
     RevModelManager() {};
-    RevModel* FindModel(ID3D12Device5* device, int type, bool loadIfNotFound = true);
-    RevModel* FindModelFromHandle(ID3D12Device5* device, int handle);
-    int FindModelHandleFromType(ID3D12Device5* device, int type, bool loadIfNotFound = true);
+    RevModel* FindModel(int type, bool loadIfNotFound = true);
+    RevModel* FindModelFromHandle(int handle);
+    int FindModelHandleFromType(int type, bool loadIfNotFound = true);
 
     std::vector<RevModel*> m_models;
 

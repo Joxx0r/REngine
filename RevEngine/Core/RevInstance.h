@@ -8,7 +8,7 @@ class RevInstance
 public:
     RevInstance() {};
 
-    void Initialize(RevModelManager* manager,  ID3D12Device5* device, int modelType, DirectX::XMMATRIX transform,  Microsoft::WRL::ComPtr<ID3D12Resource> resource);
+    void Initialize(RevModelManager* manager,  int modelType, DirectX::XMMATRIX transform,  Microsoft::WRL::ComPtr<ID3D12Resource> resource);
     void DrawInstance(ID3D12GraphicsCommandList4* list);
 
     DirectX::XMMATRIX m_transform;

@@ -114,6 +114,7 @@
   <ItemGroup>
     <ClInclude Include="BottomLevelASGenerator.h" />
     <ClInclude Include="Core\RevCamera.h" />
+    <ClInclude Include="Core\RevEngineManager.h" />
     <ClInclude Include="Core\RevInstance.h" />
     <ClInclude Include="Core\RevInstanceManager.h" />
     <ClInclude Include="Core\RevModel.h" />
@@ -267,6 +268,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Core\RevEngineManager.cpp" />
     <ClCompile Include="Core\RevInstance.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
