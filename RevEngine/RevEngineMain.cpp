@@ -20,6 +20,7 @@
 #include "Core/RevInstanceManager.h"
 #include "Core/RevModelManager.h"
 #include "Core/RevModelTypes.h"
+#include "Core/RevScene.h"
 
 RevEngineMain* RevEngineMain::s_instance = nullptr;
 
@@ -30,10 +31,7 @@ RevEngineMain::RevEngineMain(const RevWindowData& data)
 	GetAssetsPath(assetsPath, _countof(assetsPath));
 	m_assetsPath = assetsPath;
 	m_camera.Initialize(m_windowData.GetAspectRatio());
-	m_instanceManager = new RevInstanceManager();
 	m_modelManager = new RevModelManager();
-	m_instanceManager->Initialize(m_modelManager);
-	m_managers.push_back(m_instanceManager);
 	m_managers.push_back(m_modelManager);
 }
 RevEngineMain* RevEngineMain::Construct(const RevWindowData& data)
@@ -71,6 +69,7 @@ void RevEngineMain::OnInit()
 		manager->InitializeGraphics(m_device.Get(), m_commandList.Get());
 	}
 	CheckRaytracingSupport();
+	
 	CreateAccelerationStructures();
 	ThrowIfFailed(m_commandList->Close());
 	CreateRaytracingPipeline();
@@ -374,7 +373,7 @@ void RevEngineMain::PopulateCommandList() const
 		const float clearColor[] = {0.0f, 0.2f, 0.4f, 1.0f};
 		m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-		m_instanceManager->DrawInstances(m_commandList.Get());
+		m_scene->DrawScene();
 	}
 	else
 	{
@@ -555,8 +554,8 @@ void RevEngineMain::UpdateInput(float delta)
 }
 void RevEngineMain::CreateTopLevelAS()
 {
-		// Gather all the instances into the builder helper
-	m_instanceManager->AddAllInstancesToSBT(&m_topLevelASGenerator);
+	// Gather all the instances into the builder helper
+	m_scene->m_manager->AddAllInstancesToSBT(&m_topLevelASGenerator);
 
 	// As for the bottom-level AS, the building the AS requires some scratch space
 	// to store temporary data in addition to the actual AS. In the case of the
@@ -599,12 +598,9 @@ void RevEngineMain::CreateTopLevelAS()
 
 void RevEngineMain::CreateAccelerationStructures()
 {
-	// Just one instance for now
-	m_instanceManager->AddInstance(RevEModelType::Triangle,  XMMatrixTranslation(.6f, 0, 0));
-	m_instanceManager->AddInstance(RevEModelType::Triangle, XMMatrixTranslation(-.6f, 0, 0));
-	m_instanceManager->AddInstance(RevEModelType::Triangle,  XMMatrixTranslation(0, 0, 0));
-	m_instanceManager->AddInstance(RevEModelType::Plane,  XMMatrixTranslation(0, 0, 0));
-	
+	m_scene = new RevScene();
+	m_scene->Initialize(this);
+
 	// Build the bottom AS from the Triangle vertex buffer
 	m_modelManager->GenerateAccelerationBuffersAllModels();
 	CreateTopLevelAS();

@@ -23,7 +23,7 @@ public:
 
     void AddAllInstancesToSBT(  nv_helpers_dx12::TopLevelASGenerator* generator);
     
-    void DrawInstances(ID3D12GraphicsCommandList4* list);
+    void DrawInstances();
     
     RevModelManager* m_modelManager = nullptr;
 

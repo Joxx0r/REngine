@@ -1,7 +1,5 @@
 ﻿#include "stdafx.h"
 #include "RevInstanceManager.h"
-
-
 #include "RevModel.h"
 #include "../TopLevelASGenerator.h"
 
@@ -16,6 +14,7 @@ void RevInstanceManager::AddInstance(RevEModelType desiredType,  DirectX::XMMATR
     newInstance->Initialize(m_modelManager, desiredType, transform);
     m_instances.push_back(newInstance);
 }
+
 void RevInstanceManager::AddAllInstancesToSBT(nv_helpers_dx12::TopLevelASGenerator* generator)
 {
     assert(generator);
@@ -28,12 +27,12 @@ void RevInstanceManager::AddAllInstancesToSBT(nv_helpers_dx12::TopLevelASGenerat
     }
 }
 
-void RevInstanceManager::DrawInstances(ID3D12GraphicsCommandList4* list)
+void RevInstanceManager::DrawInstances()
 {
     for(RevInstance* instance : m_instances)
     {
         assert(instance);
-        instance->DrawInstance(list);
+        instance->DrawInstance(m_list);
     }
 }
         

@@ -20,6 +20,7 @@
 #include "Core/RevModelManager.h"
 #include "Misc/RevTypes.h"
 
+class RevScene;
 using namespace DirectX;
 
 using Microsoft::WRL::ComPtr;
@@ -157,10 +158,11 @@ public:
     // Root assets path.
     std::wstring m_assetsPath;
 
-    RevInstanceManager* m_instanceManager;
     RevModelManager* m_modelManager;
     std::vector<RevEngineManager*> m_managers;
 
+
+    RevScene* m_scene = nullptr;
     static RevEngineMain* s_instance;
 };
 
