@@ -1,18 +1,17 @@
 ﻿#include "stdafx.h"
 #include "RevModel.h"
-
 #include "RevCoreDefines.h"
+#include "RevEngineRetrievalFunctions.h"
 #include "RevModelTypes.h"
 #include "../BottomLevelASGenerator.h"
 
-void RevModel::Initialize(RevEModelType type, REV_ID_HANDLE handle, ID3D12Device5* device)
+void RevModel::Initialize(RevEModelType type, REV_ID_HANDLE handle)
 {
 	m_type = type;
 	m_handle = handle;
     if(type == RevEModelType::Triangle)
     {
     	RevVertInitializationData initData = {};
-    	initData.m_device = device;
         {
             // Define the geometry for a triangle.
             initData.m_generatedData.m_vertexes = {
@@ -30,7 +29,6 @@ void RevModel::Initialize(RevEModelType type, REV_ID_HANDLE handle, ID3D12Device
     if(type == RevEModelType::Plane)
     {
     	RevVertInitializationData initData = {};
-    	initData.m_device = device;
 	    {
 		    // Define the geometry for a plane.
     		initData.m_generatedData.m_vertexes = {
@@ -49,8 +47,9 @@ void RevModel::Initialize(RevEModelType type, REV_ID_HANDLE handle, ID3D12Device
 		assert(false);
 	}
 }
-void RevModel::DrawRasterized(ID3D12GraphicsCommandList4* list) const
+void RevModel::DrawRasterized() const
 {
+	ID3D12GraphicsCommandList4* list = RevEngineRetrievalFunctions::GetCommandList();
 	bool drawIndexed = false;
 	if(m_baseData.m_d3dData.m_vertexBuffer.Get())
 	{
@@ -74,8 +73,8 @@ void RevModel::DrawRasterized(ID3D12GraphicsCommandList4* list) const
 	}
 }
 
-AccelerationStructureBuffers RevModel::CreateStructureBuffer(ID3D12Device5* device, ID3D12GraphicsCommandList4* list)
+AccelerationStructureBuffers RevModel::CreateStructureBuffer()
 {
-	m_relevantBuffers =  RevVertIndexData::CreateAccelerationStructure(m_baseData, device, list);
+	m_relevantBuffers =  RevVertIndexData::CreateAccelerationStructure(m_baseData);
 	return m_relevantBuffers;
 }

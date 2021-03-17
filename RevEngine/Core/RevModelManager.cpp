@@ -19,7 +19,7 @@ RevModel* RevModelManager::FindModel(RevEModelType desiredType, bool loadIfNotFo
     {
         RevModel* model = new RevModel();
         m_modelCounter++;
-        model->Initialize(desiredType, m_modelCounter, m_device);
+        model->Initialize(desiredType, m_modelCounter);
         m_models.push_back(model);
         return model;
     }
@@ -55,7 +55,7 @@ REV_ID_HANDLE RevModelManager::FindModelHandleFromType( RevEModelType desiredTyp
     {
         RevModel* model = new RevModel();
         m_modelCounter++;
-        model->Initialize(desiredType,m_modelCounter, m_device);
+        model->Initialize(desiredType,m_modelCounter);
         m_models.push_back(model);
         return model->m_handle;
     }
@@ -68,6 +68,6 @@ void RevModelManager::GenerateAccelerationBuffersAllModels()
     for(int index = 0; index < m_models.size(); index++)
     {
         assert(m_models[index]);
-        m_models[index]->CreateStructureBuffer(m_device, m_list);
+        m_models[index]->CreateStructureBuffer();
     }
 }

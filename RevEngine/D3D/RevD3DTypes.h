@@ -31,7 +31,6 @@ struct RevModelD3DData
 
 struct RevVertInitializationData
 {
-    ID3D12Device5* m_device;
     RevModelData m_generatedData;
 };
     
@@ -42,8 +41,7 @@ struct RevVertIndexData
 
     static RevVertIndexData Create(const RevVertInitializationData& data);
     static AccelerationStructureBuffers CreateAccelerationStructure(
-            const RevVertIndexData& inData,
-               ID3D12Device5* device, ID3D12GraphicsCommandList4* list); 
+            const RevVertIndexData& inData); 
     
 };
 

@@ -12,5 +12,5 @@ public:
 
     void DrawScene();
     
-    RevInstanceManager* m_manager;
+    RevInstanceManager* m_instanceManager;
 };

@@ -116,6 +116,7 @@
     <ClInclude Include="Core\RevCamera.h" />
     <ClInclude Include="Core\RevCoreDefines.h" />
     <ClInclude Include="Core\RevEngineManager.h" />
+    <ClInclude Include="Core\RevEngineRetrievalFunctions.h" />
     <ClInclude Include="Core\RevInstance.h" />
     <ClInclude Include="Core\RevInstanceManager.h" />
     <ClInclude Include="Core\RevModel.h" />
@@ -271,6 +272,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Core\RevEngineManager.cpp" />
+    <ClCompile Include="Core\RevEngineRetrievalFunctions.cpp" />
     <ClCompile Include="Core\RevInstance.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

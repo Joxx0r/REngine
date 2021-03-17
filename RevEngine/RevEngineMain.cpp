@@ -32,7 +32,6 @@ RevEngineMain::RevEngineMain(const RevWindowData& data)
 	m_assetsPath = assetsPath;
 	m_camera.Initialize(m_windowData.GetAspectRatio());
 	m_modelManager = new RevModelManager();
-	m_managers.push_back(m_modelManager);
 }
 RevEngineMain* RevEngineMain::Construct(const RevWindowData& data)
 {
@@ -62,12 +61,6 @@ void RevEngineMain::OnInit()
 {	
 	LoadPipeline();
 	LoadAssets();
-	//we initialize managers here for d3d
-	for (RevEngineManager* manager : m_managers)
-	{
-		assert(manager);
-		manager->InitializeGraphics(m_device.Get(), m_commandList.Get());
-	}
 	CheckRaytracingSupport();
 	
 	CreateAccelerationStructures();
@@ -555,7 +548,7 @@ void RevEngineMain::UpdateInput(float delta)
 void RevEngineMain::CreateTopLevelAS()
 {
 	// Gather all the instances into the builder helper
-	m_scene->m_manager->AddAllInstancesToSBT(&m_topLevelASGenerator);
+	m_scene->m_instanceManager->AddAllInstancesToSBT(&m_topLevelASGenerator);
 
 	// As for the bottom-level AS, the building the AS requires some scratch space
 	// to store temporary data in addition to the actual AS. In the case of the

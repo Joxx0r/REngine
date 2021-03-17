@@ -4,10 +4,12 @@
 #include "../BottomLevelASGenerator.h"
 #include "../DXRHelper.h"
 #include "../DXSampleHelper.h"
+#include "../Core/RevEngineRetrievalFunctions.h"
 
 RevVertIndexData RevVertIndexData::Create(const RevVertInitializationData& data)
 {
     RevVertIndexData returnData = {};
+	ID3D12Device5* device = RevEngineRetrievalFunctions::GetDevice();
     if(data.m_generatedData.m_vertexes.size() > 0)
     {
         const UINT vertexBufferSize = sizeof(Vertex) * static_cast<UINT>(data.m_generatedData.m_vertexes.size());
@@ -17,7 +19,7 @@ RevVertIndexData RevVertIndexData::Create(const RevVertInitializationData& data)
         // marshalled over. Please read up on Default Heap usage. An upload heap is
         // used here for code simplicity and because there are very few verts to
         // actually transfer.
-        ThrowIfFailed(data.m_device->CreateCommittedResource(
+        ThrowIfFailed(device->CreateCommittedResource(
             // ReSharper disable once CppMsExtAddressOfClassRValue
             &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
             // ReSharper disable once CppMsExtAddressOfClassRValue
@@ -46,7 +48,7 @@ RevVertIndexData RevVertIndexData::Create(const RevVertInitializationData& data)
         const UINT indexBufferSize = static_cast<UINT>(data.m_generatedData.m_indices.size()) * sizeof(UINT);
         CD3DX12_HEAP_PROPERTIES heapProperty = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
         CD3DX12_RESOURCE_DESC bufferResource = CD3DX12_RESOURCE_DESC::Buffer(indexBufferSize);
-        ThrowIfFailed(data.m_device->CreateCommittedResource(
+        ThrowIfFailed(device->CreateCommittedResource(
             &heapProperty, D3D12_HEAP_FLAG_NONE, &bufferResource, //
             D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&returnData.m_d3dData.m_indexBuffer)));
 
@@ -66,8 +68,10 @@ RevVertIndexData RevVertIndexData::Create(const RevVertInitializationData& data)
     returnData.m_modelData = data.m_generatedData;
     return returnData;
 }
-AccelerationStructureBuffers RevVertIndexData::CreateAccelerationStructure(const RevVertIndexData& inData, ID3D12Device5* device, ID3D12GraphicsCommandList4* list)
+AccelerationStructureBuffers RevVertIndexData::CreateAccelerationStructure(const RevVertIndexData& inData)
 {
+	ID3D12Device5* device = RevEngineRetrievalFunctions::GetDevice();
+	ID3D12GraphicsCommandList4* list = RevEngineRetrievalFunctions::GetCommandList();
     nv_helpers_dx12::BottomLevelASGenerator bottomLevelAS;
 	// Adding all vertex buffers and not transforming their position.
 	if(inData.m_d3dData.m_vertexBuffer.Get() != nullptr)
