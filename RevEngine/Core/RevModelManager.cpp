@@ -2,17 +2,62 @@
 #include "RevModelManager.h"
 #include "RevModel.h"
 
-bool RevModelManager::LoadModel(ID3D12Device5* device, int type, RevModel& outType)
+RevModel* RevModelManager::FindModel(ID3D12Device5* device, int type, bool loadIfNotFound /*= true*/)
 {
     for(int index = 0; index < m_models.size(); index++)
     {
-        if(m_models[index].m_type == type)
+        assert(m_models[index]);
+        if(m_models[index]->m_type == type)
         {
-            outType = m_models[index];
-            return true;
+            return m_models[index];
         }
     }
-    outType.Initialize(type, device);
-    m_models.push_back(outType);
-    return true;
+
+    if(loadIfNotFound)
+    {
+        RevModel* model = new RevModel();
+        m_modelCounter++;
+        model->Initialize(type, m_modelCounter,device);
+        m_models.push_back(model);
+        return model;
+    }
+    
+    return nullptr;
+}
+RevModel* RevModelManager::FindModelFromHandle(ID3D12Device5* device, int handle)
+{
+    for(int index = 0; index < m_models.size(); index++)
+    {
+        assert(m_models[index]);
+        if(m_models[index]->m_handle == handle)
+        {
+            return m_models[index];
+        }
+    }
+    
+    return nullptr;
+}
+
+int RevModelManager::FindModelHandleFromType(ID3D12Device5* device,  int type, bool loadIfNotFound)
+{
+    for(int index = 0; index < m_models.size(); index++)
+    {
+        assert(m_models[index]);
+        if(m_models[index]->m_type == type)
+        {
+            return m_models[index]->m_handle;
+        }
+    }
+
+    if(loadIfNotFound)
+    {
+        RevModel* model = new RevModel();
+        m_modelCounter++;
+        model->Initialize(type,m_modelCounter, device);
+        m_models.push_back(model);
+        return model->m_handle;
+    }
+
+    return -1;
+    
 }

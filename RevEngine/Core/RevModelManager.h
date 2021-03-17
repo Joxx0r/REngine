@@ -6,8 +6,12 @@ class RevModelManager
 {
 public:
     RevModelManager() {};
-    bool LoadModel(ID3D12Device5* device, int type, RevModel& outType);
+    RevModel* FindModel(ID3D12Device5* device, int type, bool loadIfNotFound = true);
+    RevModel* FindModelFromHandle(ID3D12Device5* device, int handle);
+    int FindModelHandleFromType(ID3D12Device5* device, int type, bool loadIfNotFound = true);
 
-    std::vector<RevModel> m_models;
+    std::vector<RevModel*> m_models;
+
+    int m_modelCounter = 0;
 };
 

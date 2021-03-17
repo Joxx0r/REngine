@@ -12,7 +12,7 @@ class RevModel
 public:
     RevModel() {};
 
-    void Initialize(int type, ID3D12Device5* device);
+    void Initialize(int type, int handle, ID3D12Device5* device);
 
     void DrawRasterized(ID3D12GraphicsCommandList4* list) const;
     
@@ -22,4 +22,5 @@ public:
     RevVertIndexData m_baseData;
 
     int m_type;
+    int m_handle = -1;
 };

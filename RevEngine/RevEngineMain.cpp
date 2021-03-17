@@ -39,7 +39,7 @@ void RevEngineMain::OnInit()
 {	
 	LoadPipeline();
 	LoadAssets();
-	m_modelManager->LoadModel(m_device.Get(), 1, m_planeModel);
+	m_planeModelHandle = m_modelManager->FindModelHandleFromType(m_device.Get(), 1);
 	CheckRaytracingSupport();
 	CreateAccelerationStructures();
 	ThrowIfFailed(m_commandList->Close());
@@ -249,7 +249,7 @@ void RevEngineMain::LoadAssets()
 
 	// Create the vertex buffer.
 	{
-		m_modelManager->LoadModel(m_device.Get(), 0, m_triangleModel);
+		m_triangleHandle = m_modelManager->FindModelHandleFromType(m_device.Get(), 0);
 	}
 	// Create synchronization objects and wait until assets have been uploaded to
 	// the GPU.
@@ -353,8 +353,8 @@ void RevEngineMain::PopulateCommandList() const
 		const float clearColor[] = {0.0f, 0.2f, 0.4f, 1.0f};
 		m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-		m_triangleModel.DrawRasterized(m_commandList.Get());
-		m_planeModel.DrawRasterized(m_commandList.Get());
+		m_modelManager->FindModelFromHandle(m_device.Get(), m_triangleHandle)->DrawRasterized(m_commandList.Get());
+		m_modelManager->FindModelFromHandle(m_device.Get(), m_planeModelHandle)->DrawRasterized(m_commandList.Get());
 	}
 	else
 	{
@@ -666,8 +666,8 @@ void RevEngineMain::CreateTopLevelAS(
 void RevEngineMain::CreateAccelerationStructures()
 {
 	// Build the bottom AS from the Triangle vertex buffer
-	AccelerationStructureBuffers bottomLevelBuffers = m_triangleModel.CreateStructureBuffer(m_device.Get(), m_commandList.Get());
-	AccelerationStructureBuffers planeBottomLevelBuffers = m_planeModel.CreateStructureBuffer(m_device.Get(), m_commandList.Get());
+	AccelerationStructureBuffers bottomLevelBuffers = m_modelManager->FindModelFromHandle(m_device.Get(), m_triangleHandle)->CreateStructureBuffer(m_device.Get(), m_commandList.Get());
+	AccelerationStructureBuffers planeBottomLevelBuffers =  m_modelManager->FindModelFromHandle(m_device.Get(), m_planeModelHandle)->CreateStructureBuffer(m_device.Get(), m_commandList.Get());
 
 	// Just one instance for now
 	

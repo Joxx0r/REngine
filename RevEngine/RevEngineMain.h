@@ -187,8 +187,8 @@ private:
     RevInstanceManager* m_instanceManager;
     RevModelManager* m_modelManager;
 
-    RevModel m_triangleModel = {};
-    RevModel m_planeModel = {};
+    int m_triangleHandle = -1;
+    int m_planeModelHandle = -1;
     
 };
 
