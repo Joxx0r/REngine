@@ -15,8 +15,9 @@
 
 HWND Win32Application::m_hwnd = nullptr;
 
-int Win32Application::Run(RevEngineMain* pSample, HINSTANCE hInstance, int nCmdShow)
+int Win32Application::Run(HINSTANCE hInstance, int nCmdShow)
 {
+    RevEngineMain* main = RevEngineMain::Construct(1024, 720, L"RevEngine");
     // Initialize the window class.
     WNDCLASSEX windowClass = { 0 };
     windowClass.cbSize = sizeof(WNDCLASSEX);
@@ -27,13 +28,13 @@ int Win32Application::Run(RevEngineMain* pSample, HINSTANCE hInstance, int nCmdS
     windowClass.lpszClassName = L"DXSampleClass";
     RegisterClassEx(&windowClass);
 
-    RECT windowRect = { 0, 0, static_cast<LONG>(pSample->GetWidth()), static_cast<LONG>(pSample->GetHeight()) };
+    RECT windowRect = { 0, 0, static_cast<LONG>(main->GetWidth()), static_cast<LONG>(main->GetHeight()) };
     AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
     // Create the window and store a handle to it.
     m_hwnd = CreateWindow(
         windowClass.lpszClassName,
-        pSample->GetTitle(),
+        main->GetTitle(),
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
@@ -42,10 +43,10 @@ int Win32Application::Run(RevEngineMain* pSample, HINSTANCE hInstance, int nCmdS
         nullptr,        // We have no parent window.
         nullptr,        // We aren't using menus.
         hInstance,
-        pSample);
+        main);
 
     // Initialize the sample. OnInit is defined in each child-implementation of DXSample.
-    pSample->OnInit();
+    main->OnInit();
 
     ShowWindow(m_hwnd, nCmdShow);
     //time management
@@ -83,8 +84,8 @@ int Win32Application::Run(RevEngineMain* pSample, HINSTANCE hInstance, int nCmdS
                 {
                     frameUpdateTime = 0.0;
                 }
-                pSample->OnUpdate(targetFrameRate);
-                pSample->OnRender();
+                main->OnUpdate(targetFrameRate);
+                main->OnRender();
             }
         }
         else
@@ -103,7 +104,7 @@ int Win32Application::Run(RevEngineMain* pSample, HINSTANCE hInstance, int nCmdS
         }
     }
 
-    pSample->OnDestroy();
+    main->OnDestroy();
 
     // Return this part of the WM_QUIT message to Windows.
     return static_cast<char>(msg.wParam);
@@ -112,7 +113,6 @@ int Win32Application::Run(RevEngineMain* pSample, HINSTANCE hInstance, int nCmdS
 // Main message handler for the sample.
 LRESULT CALLBACK Win32Application::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    RevEngineMain* pSample = reinterpret_cast<RevEngineMain*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
     switch (message)
     {
@@ -125,34 +125,22 @@ LRESULT CALLBACK Win32Application::WindowProc(HWND hWnd, UINT message, WPARAM wP
         return 0;
 
     case WM_KEYDOWN:
-        if (pSample)
-        {
-            pSample->OnKeyDown(static_cast<UINT8>(wParam));
-        }
+        RevEngineMain::Get()->OnKeyDown(static_cast<UINT8>(wParam));
         if (static_cast<UINT8>(wParam) == VK_ESCAPE)
         {
             PostQuitMessage(0);
         }
         return 0;
     case WM_KEYUP:
-        if (pSample)
-        {
-            pSample->OnKeyUp(static_cast<UINT8>(wParam));
-        }
+        RevEngineMain::Get()->OnKeyUp(static_cast<UINT8>(wParam));
         return 0;
     case WM_LBUTTONDOWN:
   case WM_RBUTTONDOWN:
   case WM_MBUTTONDOWN:
-    if (pSample)
-    {
-        pSample->OnButtonDown(static_cast<UINT32>(lParam));
-    }
+        RevEngineMain::Get()->OnButtonDown(static_cast<UINT32>(lParam));
         return 0;
     case WM_MOUSEMOVE:
-        if (pSample)
-        {
-            pSample->OnMouseMove(static_cast<UINT8>(wParam), static_cast<UINT32>(lParam));
-        }
+        RevEngineMain::Get()->OnMouseMove(static_cast<UINT8>(wParam), static_cast<UINT32>(lParam));
         return 0;
     case WM_DESTROY:
         PostQuitMessage(0);

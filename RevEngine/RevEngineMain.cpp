@@ -20,6 +20,8 @@
 #include "Core/RevModelManager.h"
 #include "Core/RevModelTypes.h"
 
+RevEngineMain* RevEngineMain::s_instance = nullptr;
+
 RevEngineMain::RevEngineMain(const UINT width, const UINT height,const std::wstring name)
 : m_width(width),
 m_height(height),
@@ -36,6 +38,29 @@ m_title(name)
 	m_instanceManager->Initialize(m_modelManager);
 	m_managers.push_back(m_instanceManager);
 	m_managers.push_back(m_modelManager);
+}
+RevEngineMain* RevEngineMain::Construct(const UINT width, const UINT height,const std::wstring name)
+{
+	if(s_instance)
+	{
+		return s_instance;
+	}
+	s_instance = new RevEngineMain(width, height, name);
+	return s_instance;
+}
+
+void RevEngineMain::Destroy()
+{
+	if(!s_instance)
+	{
+		return;
+	}
+	delete(s_instance);
+}
+
+RevEngineMain* RevEngineMain::Get()
+{
+	return s_instance;
 }
 
 void RevEngineMain::OnInit()

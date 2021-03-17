@@ -45,13 +45,16 @@ class RevEngineMain
 public:
     RevEngineMain(UINT width, UINT height, std::wstring name);
 
+    static RevEngineMain* Construct(const UINT width, const UINT height,const std::wstring name);
+    static void Destroy();
+    static RevEngineMain* Get();
+
     virtual void OnInit();
     virtual void OnUpdate(float delta);
     virtual void OnRender();
     virtual void OnDestroy();
 
     static const UINT FrameCount = 2;
-
 
     // Pipeline objects.
     CD3DX12_VIEWPORT m_viewport;
@@ -181,7 +184,6 @@ protected:
     UINT m_height;
     float m_aspectRatio;
 
-private:
     // Root assets path.
     std::wstring m_assetsPath;
 
@@ -191,5 +193,9 @@ private:
     RevInstanceManager* m_instanceManager;
     RevModelManager* m_modelManager;
     std::vector<RevEngineManager*> m_managers;
+
+public:
+    
+    static RevEngineMain* s_instance;
 };
 

@@ -16,6 +16,5 @@
 _Use_decl_annotations_
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
-    RevEngineMain sample(1280, 720, L"Revelations Engine");
-    return Win32Application::Run(&sample, hInstance, nCmdShow);
+    return Win32Application::Run(hInstance, nCmdShow);
 }
