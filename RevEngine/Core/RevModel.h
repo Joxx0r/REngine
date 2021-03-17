@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "RevCoreDefines.h"
 #include "../TopLevelASGenerator.h"
 #include "../D3D/RevD3DTypes.h"
 
@@ -22,5 +23,5 @@ public:
     RevVertIndexData m_baseData;
 
     int m_type;
-    int m_handle = -1;
+    REV_ID_HANDLE m_handle = REV_INDEX_NONE;
 };

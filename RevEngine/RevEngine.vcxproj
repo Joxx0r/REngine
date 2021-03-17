@@ -114,6 +114,7 @@
   <ItemGroup>
     <ClInclude Include="BottomLevelASGenerator.h" />
     <ClInclude Include="Core\RevCamera.h" />
+    <ClInclude Include="Core\RevCoreDefines.h" />
     <ClInclude Include="Core\RevEngineManager.h" />
     <ClInclude Include="Core\RevInstance.h" />
     <ClInclude Include="Core\RevInstanceManager.h" />

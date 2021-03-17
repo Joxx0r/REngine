@@ -1,9 +1,11 @@
 ﻿#include "stdafx.h"
 #include "RevModel.h"
+
+#include "RevCoreDefines.h"
 #include "RevModelTypes.h"
 #include "../BottomLevelASGenerator.h"
 
-void RevModel::Initialize(int type, int handle, ID3D12Device5* device)
+void RevModel::Initialize(int type, REV_ID_HANDLE handle, ID3D12Device5* device)
 {
 	m_type = type;
 	m_handle = handle;

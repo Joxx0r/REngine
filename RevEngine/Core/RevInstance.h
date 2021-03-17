@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <DirectXMath.h>
 
+
+#include "RevCoreDefines.h"
 #include "RevModelManager.h"
 
 class RevInstance
@@ -16,7 +18,7 @@ public:
     ID3D12Device5* m_device = nullptr;
     RevModelManager* m_modelManager = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> m_resource = nullptr;
-    int m_modelHandle;
-    int m_instanceHandle;
+    REV_ID_HANDLE m_modelHandle;
+    REV_ID_HANDLE m_instanceHandle;
 };
 

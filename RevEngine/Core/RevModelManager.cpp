@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 #include "RevModelManager.h"
+
+#include "RevCoreDefines.h"
 #include "RevModel.h"
 
 RevModel* RevModelManager::FindModel(int type, bool loadIfNotFound /*= true*/)
@@ -38,7 +40,7 @@ RevModel* RevModelManager::FindModelFromHandle( int handle)
     return nullptr;
 }
 
-int RevModelManager::FindModelHandleFromType( int type, bool loadIfNotFound)
+REV_ID_HANDLE RevModelManager::FindModelHandleFromType( int type, bool loadIfNotFound)
 {
     for(int index = 0; index < m_models.size(); index++)
     {
