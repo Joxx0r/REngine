@@ -8,7 +8,7 @@ RevCamera::RevCamera()
     float pitchRadian = m_pitch * (XM_PI / 180.0f);
     float yawRadian = m_yaw* (XM_PI / 180.0f);
     m_direction = XMVectorSet(XMScalarCos(yawRadian * XMScalarCos(pitchRadian)), XMScalarSin(pitchRadian), XMScalarSin(yawRadian* XMScalarCos(pitchRadian)), 0.0f);
-    m_worldLoc = XMVectorSet(0, 0, 1.5f, 1.0f);
+    m_worldLoc = XMVectorSet(0, 0, 5.5f, 1.0f);
     m_direction = XMVectorSet(0, 0, -1.0f, 0.0f);
 
 }

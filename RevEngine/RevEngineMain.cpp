@@ -33,13 +33,13 @@ m_title(name)
 	m_camera.Initialize(m_aspectRatio);
 	m_instanceManager = new RevInstanceManager();
 	m_modelManager = new RevModelManager();
+	m_revInstances.reserve(100);
 }
 
 void RevEngineMain::OnInit()
 {	
 	LoadPipeline();
 	LoadAssets();
-	m_planeModelHandle = m_modelManager->FindModelHandleFromType(m_device.Get(), 1);
 	CheckRaytracingSupport();
 	CreateAccelerationStructures();
 	ThrowIfFailed(m_commandList->Close());
@@ -247,10 +247,6 @@ void RevEngineMain::LoadAssets()
 		0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator.Get(),
 		m_pipelineState.Get(), IID_PPV_ARGS(&m_commandList)));
 
-	// Create the vertex buffer.
-	{
-		m_triangleHandle = m_modelManager->FindModelHandleFromType(m_device.Get(), 0);
-	}
 	// Create synchronization objects and wait until assets have been uploaded to
 	// the GPU.
 	{
@@ -353,8 +349,10 @@ void RevEngineMain::PopulateCommandList() const
 		const float clearColor[] = {0.0f, 0.2f, 0.4f, 1.0f};
 		m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-		m_modelManager->FindModelFromHandle(m_device.Get(), m_triangleHandle)->DrawRasterized(m_commandList.Get());
-		m_modelManager->FindModelFromHandle(m_device.Get(), m_planeModelHandle)->DrawRasterized(m_commandList.Get());
+		for(RevInstance* instance : m_revInstances)
+		{
+			instance->DrawInstance(m_commandList.Get());	
+		}
 	}
 	else
 	{
@@ -657,6 +655,53 @@ void RevEngineMain::CreateTopLevelAS(
 	                               m_topLevelASBuffers.pResult.Get(),
 	                               m_topLevelASBuffers.pInstanceDesc.Get());
 }
+void RevEngineMain::CreateTopLevelAS(const std::vector<RevInstance*>& instances)
+{
+		// Gather all the instances into the builder helper
+	for (size_t i = 0; i < instances.size(); i++)
+	{
+		m_topLevelASGenerator.AddInstance(instances[i]->m_resource.Get(), instances[i]->m_transform,
+                                          static_cast<UINT>(i), static_cast<UINT>(i));
+	}
+
+	// As for the bottom-level AS, the building the AS requires some scratch space
+	// to store temporary data in addition to the actual AS. In the case of the
+	// top-level AS, the instance descriptors also need to be stored in GPU
+	// memory. This call outputs the memory requirements for each (scratch,
+	// results, instance descriptors) so that the application can allocate the
+	// corresponding memory
+	UINT64 scratchSize, resultSize, instanceDescsSize;
+
+	m_topLevelASGenerator.ComputeASBufferSizes(m_device.Get(), true, &scratchSize,
+	                                           &resultSize, &instanceDescsSize);
+
+	// Create the scratch and result buffers. Since the build is all done on GPU,
+	// those can be allocated on the default heap
+	m_topLevelASBuffers.pScratch = nv_helpers_dx12::CreateBuffer(
+		m_device.Get(), scratchSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+		nv_helpers_dx12::kDefaultHeapProps);
+	m_topLevelASBuffers.pResult = nv_helpers_dx12::CreateBuffer(
+		m_device.Get(), resultSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
+		nv_helpers_dx12::kDefaultHeapProps);
+
+	// The buffer describing the instances: ID, shader binding information,
+	// matrices ... Those will be copied into the buffer by the helper through
+	// mapping, so the buffer has to be allocated on the upload heap.
+	m_topLevelASBuffers.pInstanceDesc = nv_helpers_dx12::CreateBuffer(
+		m_device.Get(), instanceDescsSize, D3D12_RESOURCE_FLAG_NONE,
+		D3D12_RESOURCE_STATE_GENERIC_READ, nv_helpers_dx12::kUploadHeapProps);
+
+	// After all the buffers are allocated, or if only an update is required, we
+	// can build the acceleration structure. Note that in the case of the update
+	// we also pass the existing AS as the 'previous' AS, so that it can be
+	// refitted in place.
+	m_topLevelASGenerator.Generate(m_commandList.Get(),
+	                               m_topLevelASBuffers.pScratch.Get(),
+	                               m_topLevelASBuffers.pResult.Get(),
+	                               m_topLevelASBuffers.pInstanceDesc.Get());
+}
 
 //-----------------------------------------------------------------------------
 //
@@ -666,17 +711,24 @@ void RevEngineMain::CreateTopLevelAS(
 void RevEngineMain::CreateAccelerationStructures()
 {
 	// Build the bottom AS from the Triangle vertex buffer
-	AccelerationStructureBuffers bottomLevelBuffers = m_modelManager->FindModelFromHandle(m_device.Get(), m_triangleHandle)->CreateStructureBuffer(m_device.Get(), m_commandList.Get());
-	AccelerationStructureBuffers planeBottomLevelBuffers =  m_modelManager->FindModelFromHandle(m_device.Get(), m_planeModelHandle)->CreateStructureBuffer(m_device.Get(), m_commandList.Get());
+	AccelerationStructureBuffers bottomLevelBuffers = m_modelManager->FindModel(m_device.Get(), 0)->CreateStructureBuffer(m_device.Get(), m_commandList.Get());
+	AccelerationStructureBuffers planeBottomLevelBuffers =  m_modelManager->FindModel(m_device.Get(), 1)->CreateStructureBuffer(m_device.Get(), m_commandList.Get());
 
 	// Just one instance for now
-	
-	m_instances = {{bottomLevelBuffers.pResult, XMMatrixIdentity()},
-{bottomLevelBuffers.pResult, XMMatrixTranslation(.6f, 0, 0)},
-{bottomLevelBuffers.pResult, XMMatrixTranslation(-.6f, 0, 0)},
-// #DXR Extra: Per-Instance Data
-{planeBottomLevelBuffers.pResult, XMMatrixTranslation(0, 0, 0)}};
-	CreateTopLevelAS(m_instances);
+	RevInstance* instance1 = new RevInstance();
+	RevInstance* instance2 = new RevInstance();
+	RevInstance* instance3 = new RevInstance();
+	instance1->Initialize(m_modelManager, m_device.Get(), 0, XMMatrixTranslation(.6f, 0, 0), bottomLevelBuffers.pResult);
+	instance2->Initialize(m_modelManager, m_device.Get(), 0, XMMatrixTranslation(-.6f, 0, 0), bottomLevelBuffers.pResult);
+	instance3->Initialize(m_modelManager, m_device.Get(), 0, XMMatrixTranslation(0, 0, 0), bottomLevelBuffers.pResult);
+	m_revInstances.push_back(instance1);
+	m_revInstances.push_back(instance2);
+	m_revInstances.push_back(instance3);
+
+	RevInstance* planeInstance = new RevInstance();
+	planeInstance->Initialize(m_modelManager, m_device.Get(), 1, XMMatrixTranslation(0, 0, 0), planeBottomLevelBuffers.pResult);
+	m_revInstances.push_back(planeInstance);
+	CreateTopLevelAS(m_revInstances);
 
 	// Flush the command list and wait for it to finish
 	m_commandList->Close();

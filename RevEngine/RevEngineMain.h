@@ -15,6 +15,7 @@
 #include "TopLevelASGenerator.h"
 #include "ShaderBindingTableGenerator.h"
 #include "Core/RevCamera.h"
+#include "Core/RevInstance.h"
 #include "Core/RevModel.h"
 #include "Core/RevModelManager.h"
 #include "Misc/RevTypes.h"
@@ -79,6 +80,7 @@ public:
     nv_helpers_dx12::TopLevelASGenerator m_topLevelASGenerator;
     AccelerationStructureBuffers m_topLevelASBuffers;
     std::vector<std::pair<ComPtr<ID3D12Resource>, DirectX::XMMATRIX>> m_instances;
+    std::vector<RevInstance*> m_revInstances;
 
     void LoadPipeline();
     void LoadAssets();
@@ -104,6 +106,8 @@ public:
     /// \param     instances : pair of BLAS and transform
     void CreateTopLevelAS(
         const std::vector<std::pair<ComPtr<id3d12resource>, DirectX::XMMATRIX>>& instances);
+    void CreateTopLevelAS(
+        const std::vector<RevInstance*>& instances);
 
     /// Create all acceleration structures, bottom and top
     void CreateAccelerationStructures();
@@ -187,8 +191,5 @@ private:
     RevInstanceManager* m_instanceManager;
     RevModelManager* m_modelManager;
 
-    int m_triangleHandle = -1;
-    int m_planeModelHandle = -1;
-    
 };
 
