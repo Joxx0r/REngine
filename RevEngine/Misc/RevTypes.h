@@ -20,3 +20,25 @@ struct RevInputState
     bool m_forward;
     bool m_back;
 };
+
+struct RevWindowData
+{
+    static RevWindowData Construct(UINT width, UINT height, std::wstring title)
+    {
+        assert(width > 0 && height > 0);
+        RevWindowData returnData = {};
+        returnData.m_width = width;
+        returnData.m_height = height;
+        returnData.m_title = title;
+        return returnData;
+    }
+
+    float GetAspectRatio() const
+    {
+        return static_cast<float>(m_width) / static_cast<float>(m_height);
+    }
+    
+    UINT m_width;
+    UINT m_height;
+    std::wstring m_title;
+};

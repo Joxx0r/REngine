@@ -16,18 +16,12 @@
 #include "ShaderBindingTableGenerator.h"
 #include "Core/RevCamera.h"
 #include "Core/RevEngineManager.h"
-#include "Core/RevInstance.h"
 #include "Core/RevModel.h"
 #include "Core/RevModelManager.h"
 #include "Misc/RevTypes.h"
 
 using namespace DirectX;
 
-// Note that while ComPtr is used to manage the lifetime of resources on the CPU,
-// it has no understanding of the lifetime of resources on the GPU. Apps must account
-// for the GPU lifetime of resources to avoid destroying objects that may still be
-// referenced by the GPU.
-// An example of this can be found in the class method: OnDestroy().
 using Microsoft::WRL::ComPtr;
 
 class RevInstanceManager;
@@ -44,18 +38,71 @@ class RevEngineMain
 {
 public:
     virtual ~RevEngineMain() = default;
-    RevEngineMain(UINT width, UINT height, std::wstring name);
+    RevEngineMain(const RevWindowData& data);
 
-    static RevEngineMain* Construct(const UINT width, const UINT height,const std::wstring name);
+    /** Static instance retrivals */
+    static RevEngineMain* Construct(const RevWindowData& data);
     static void Destroy();
     static RevEngineMain* Get();
 
+    void LoadPipeline();
+    void LoadAssets();
+    
+    void PopulateCommandList() const;
+    void WaitForPreviousFrame();
+    
+    void CheckRaytracingSupport() const;
+    
     virtual void OnInit();
     virtual void OnUpdate(float delta);
     virtual void OnRender();
     virtual void OnDestroy();
+    void OnKeyUp(UINT8 key);
+    void OnButtonDown(UINT32 lParam);
+    void OnKeyDown(UINT8 /*key*/) {};
+    void OnMouseMove(UINT8 wParam, UINT32 lParam);
 
+    void CreateTopLevelAS();
+    void CreateAccelerationStructures();
+    ComPtr<id3d12rootsignature> CreateRayGenSignature() const;
+    ComPtr<id3d12rootsignature> CreateMissSignature() const;
+    ComPtr<id3d12rootsignature> CreateHitSignature() const;
+    void CreateRaytracingOutputBuffer();
+    void CreateShaderResourceHeap();
+    void CreateShaderBindingTable();
+    void CreateCameraBuffer();
+    void CreateDepthBuffer();
+    void CreatePerInstanceConstantBuffers();
+    void CreateRaytracingPipeline();
+    
+    UINT GetWidth() const           { return m_windowData.m_width; }
+    UINT GetHeight() const          { return m_windowData.m_height; }
+    const WCHAR* GetTitle() const   { return m_windowData.m_title.c_str(); }
+    void GetHardwareAdapter(
+        _In_ IDXGIFactory1* pFactory,
+        _Outptr_result_maybenull_ IDXGIAdapter1** ppAdapter,
+        bool requestHighPerformanceAdapter = false);
+    
+ 
+    void SetCustomWindowText(LPCWSTR text);
+
+    // #DXR Extra: Depth Buffering
+    // #DXR Extra: Perspective Camera
+    void UpdateCameraBuffer();
+    void UpdateInput(float delta);
+    
     static const UINT FrameCount = 2;
+  
+    // Synchronization objects.
+    UINT64 m_fenceValue;
+    UINT m_frameIndex;
+    HANDLE m_fenceEvent;
+    ComPtr<ID3D12Fence> m_fence;
+
+    ComPtr<id3d12resource> m_bottomLevelAS; // Storage for the bottom Level AS
+
+    nv_helpers_dx12::TopLevelASGenerator m_topLevelASGenerator;
+    AccelerationStructureBuffers m_topLevelASBuffers;
 
     // Pipeline objects.
     CD3DX12_VIEWPORT m_viewport;
@@ -72,56 +119,6 @@ public:
     UINT m_rtvDescriptorSize;
     bool m_raster = false;
 
-    std::vector<UINT> m_indices; 
-
-    // Synchronization objects.
-    UINT m_frameIndex;
-    HANDLE m_fenceEvent;
-    ComPtr<ID3D12Fence> m_fence;
-    UINT64 m_fenceValue;
-
-    ComPtr<id3d12resource> m_bottomLevelAS; // Storage for the bottom Level AS
-
-    nv_helpers_dx12::TopLevelASGenerator m_topLevelASGenerator;
-    AccelerationStructureBuffers m_topLevelASBuffers;
-    std::vector<RevInstance*> m_revInstances;
-
-    void LoadPipeline();
-    void LoadAssets();
-    void PopulateCommandList() const;
-    void WaitForPreviousFrame();
-    void CheckRaytracingSupport() const;
-    void OnKeyUp(UINT8 key);
-    void OnButtonDown(UINT32 lParam);
-    virtual void OnKeyDown(UINT8 /*key*/)   {}
-    void OnMouseMove(UINT8 wParam, UINT32 lParam);
-    void UpdateInput(float delta);
-    
-    /// Create the acceleration structure of an instance
-    ///
-    /// \param     vVertexBuffers : pair of buffer and vertex count
-    /// \return    AccelerationStructureBuffers for TLAS
-    AccelerationStructureBuffers
-    CreateBottomLevelAS(std::vector<std::pair<ComPtr<id3d12resource>, uint32_t>> vVertexBuffers,
-        std::vector<std::pair<ComPtr<id3d12resource>, uint32_t>> vIndexBuffers = {}) const;
-
-    /// Create the main acceleration structure that holds
-    /// all instances of the scene
-    /// \param     instances : pair of BLAS and transform
-    void CreateTopLevelAS(
-        const std::vector<std::pair<ComPtr<id3d12resource>, DirectX::XMMATRIX>>& instances);
-    void CreateTopLevelAS();
-
-    /// Create all acceleration structures, bottom and top
-    void CreateAccelerationStructures();
-
-    // #DXR
-    ComPtr<id3d12rootsignature> CreateRayGenSignature() const;
-    ComPtr<id3d12rootsignature> CreateMissSignature() const;
-    ComPtr<id3d12rootsignature> CreateHitSignature() const;
-
-    void CreateRaytracingPipeline();
-
     ComPtr<idxcblob> m_rayGenLibrary;
     ComPtr<idxcblob> m_hitLibrary;
     ComPtr<idxcblob> m_missLibrary;
@@ -136,66 +133,34 @@ public:
     // to use in the Shader Binding Table
     ComPtr<id3d12stateobjectproperties> m_rtStateObjectProps;
 
-    void CreateRaytracingOutputBuffer();
-    void CreateShaderResourceHeap();
     // #DXR Extra: Per-Instance Data
     ComPtr<id3d12resource> m_outputResource;
     ComPtr<id3d12descriptorheap> m_srvUavHeap;
 
-    // #DXR
-    void CreateShaderBindingTable();
     nv_helpers_dx12::ShaderBindingTableGenerator m_sbtHelper;
     ComPtr<id3d12resource> m_sbtStorage;
 
-    // #DXR Extra: Perspective Camera
-    void CreateCameraBuffer();
-    void UpdateCameraBuffer();
     ComPtr< ID3D12Resource > m_cameraBuffer;
     ComPtr< ID3D12DescriptorHeap > m_constHeap;
     uint32_t m_cameraBufferSize = 0;
 
     RevInputState m_input = {};
     RevCamera m_camera = {};
-    
-    void CreatePerInstanceConstantBuffers();
+
     std::vector<ComPtr<id3d12resource>> m_perInstanceConstantBuffers;
 
-    // #DXR Extra: Depth Buffering
-    void CreateDepthBuffer();
     ComPtr< ID3D12DescriptorHeap > m_dsvHeap;
     ComPtr< ID3D12Resource > m_depthStencil;
 
-    UINT GetWidth() const           { return m_width; }
-    UINT GetHeight() const          { return m_height; }
-    const WCHAR* GetTitle() const   { return m_title.c_str(); }
-
-
-protected:
-
-    void GetHardwareAdapter(
-        _In_ IDXGIFactory1* pFactory,
-        _Outptr_result_maybenull_ IDXGIAdapter1** ppAdapter,
-        bool requestHighPerformanceAdapter = false);
-
-    void SetCustomWindowText(LPCWSTR text);
-    
-    // Viewport dimensions.
-    UINT m_width;
-    UINT m_height;
-    float m_aspectRatio;
+    RevWindowData m_windowData;
 
     // Root assets path.
     std::wstring m_assetsPath;
-
-    // Window title.
-    std::wstring m_title;
 
     RevInstanceManager* m_instanceManager;
     RevModelManager* m_modelManager;
     std::vector<RevEngineManager*> m_managers;
 
-public:
-    
     static RevEngineMain* s_instance;
 };
 

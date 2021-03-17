@@ -23,30 +23,26 @@
 
 RevEngineMain* RevEngineMain::s_instance = nullptr;
 
-RevEngineMain::RevEngineMain(const UINT width, const UINT height,const std::wstring name)
-: m_width(width),
-m_height(height),
-m_title(name)
-,m_viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)),  m_scissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height)), m_rtvDescriptorSize(0)
+RevEngineMain::RevEngineMain(const RevWindowData& data)
+	:m_windowData(data), m_viewport(0.0f, 0.0f, static_cast<float>(data.m_width), static_cast<float>(data.m_height)),  m_scissorRect(0, 0, static_cast<LONG>(data.m_width), static_cast<LONG>(data.m_height)), m_rtvDescriptorSize(0)
 {
 	WCHAR assetsPath[512];
 	GetAssetsPath(assetsPath, _countof(assetsPath));
 	m_assetsPath = assetsPath;
-	m_aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-	m_camera.Initialize(m_aspectRatio);
+	m_camera.Initialize(m_windowData.GetAspectRatio());
 	m_instanceManager = new RevInstanceManager();
 	m_modelManager = new RevModelManager();
 	m_instanceManager->Initialize(m_modelManager);
 	m_managers.push_back(m_instanceManager);
 	m_managers.push_back(m_modelManager);
 }
-RevEngineMain* RevEngineMain::Construct(const UINT width, const UINT height,const std::wstring name)
+RevEngineMain* RevEngineMain::Construct(const RevWindowData& data)
 {
 	if(s_instance)
 	{
 		return s_instance;
 	}
-	s_instance = new RevEngineMain(width, height, name);
+	s_instance = new RevEngineMain(data);
 	return s_instance;
 }
 
@@ -127,8 +123,8 @@ void RevEngineMain::LoadPipeline()
 	// Describe and create the swap chain.
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 	swapChainDesc.BufferCount = FrameCount;
-	swapChainDesc.Width = m_width;
-	swapChainDesc.Height = m_height;
+	swapChainDesc.Width = m_windowData.m_width;
+	swapChainDesc.Height = m_windowData.m_height;
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
@@ -557,129 +553,6 @@ void RevEngineMain::UpdateInput(float delta)
 	m_input.m_back = GetAsyncKeyState(83);
 	m_camera.Update(delta, m_input);
 }
-
-//-----------------------------------------------------------------------------
-//
-// Create a bottom-level acceleration structure based on a list of vertex
-// buffers in GPU memory along with their vertex count. The build is then done
-// in 3 steps: gathering the geometry, computing the sizes of the required
-// buffers, and building the actual AS
-//
-AccelerationStructureBuffers
-RevEngineMain::CreateBottomLevelAS(
-	std::vector<std::pair<ComPtr<ID3D12Resource>, uint32_t>> vVertexBuffers, 
-        std::vector<std::pair<ComPtr<id3d12resource>, uint32_t>> vIndexBuffers) const
-{
-	nv_helpers_dx12::BottomLevelASGenerator bottomLevelAS;
-
-	// Adding all vertex buffers and not transforming their position.
-	for (int i = 0; i < vVertexBuffers.size(); i++)
-	{
-		// for (const auto &buffer : vVertexBuffers) {
-		if (i < vIndexBuffers.size() && vIndexBuffers[i].second > 0)
-		{
-			bottomLevelAS.AddVertexBuffer(vVertexBuffers[i].first.Get(), 0,
-                                  vVertexBuffers[i].second, sizeof(Vertex),
-                                  vIndexBuffers[i].first.Get(), 0,
-                                  vIndexBuffers[i].second, nullptr, 0, true);	
-		}
-		else
-		{
-			bottomLevelAS.AddVertexBuffer(vVertexBuffers[i].first.Get(), 0,
-                                          vVertexBuffers[i].second, sizeof(Vertex), 0,
-                                          0);		
-		}
-	}
-
-	// The AS build requires some scratch space to store temporary information.
-	// The amount of scratch memory is dependent on the scene complexity.
-	UINT64 scratchSizeInBytes = 0;
-	// The final AS also needs to be stored in addition to the existing vertex
-	// buffers. It size is also dependent on the scene complexity.
-	UINT64 resultSizeInBytes = 0;
-
-	bottomLevelAS.ComputeASBufferSizes(m_device.Get(), false, &scratchSizeInBytes,
-	                                   &resultSizeInBytes);
-
-	// Once the sizes are obtained, the application is responsible for allocating
-	// the necessary buffers. Since the entire generation will be done on the GPU,
-	// we can directly allocate those on the default heap
-	AccelerationStructureBuffers buffers;
-	buffers.pScratch = nv_helpers_dx12::CreateBuffer(
-		m_device.Get(), scratchSizeInBytes,
-		D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON,
-		nv_helpers_dx12::kDefaultHeapProps);
-	buffers.pResult = nv_helpers_dx12::CreateBuffer(
-		m_device.Get(), resultSizeInBytes,
-		D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
-		nv_helpers_dx12::kDefaultHeapProps);
-
-	// Build the acceleration structure. Note that this call integrates a barrier
-	// on the generated AS, so that it can be used to compute a top-level AS right
-	// after this method.
-	bottomLevelAS.Generate(m_commandList.Get(), buffers.pScratch.Get(),
-	                       buffers.pResult.Get(), false, nullptr);
-
-	return buffers;
-}
-
-//-----------------------------------------------------------------------------
-// Create the main acceleration structure that holds all instances of the scene.
-// Similarly to the bottom-level AS generation, it is done in 3 steps: gathering
-// the instances, computing the memory requirements for the AS, and building the
-// AS itself
-//
-void RevEngineMain::CreateTopLevelAS(
-	const std::vector<std::pair<ComPtr<ID3D12Resource>, DirectX::XMMATRIX>>
-	& instances // pair of bottom level AS and matrix of the instance
-)
-{
-	// Gather all the instances into the builder helper
-	for (size_t i = 0; i < instances.size(); i++)
-	{
-		m_topLevelASGenerator.AddInstance(instances[i].first.Get(), instances[i].second,
-                                          static_cast<UINT>(i), static_cast<UINT>(i));
-	}
-
-	// As for the bottom-level AS, the building the AS requires some scratch space
-	// to store temporary data in addition to the actual AS. In the case of the
-	// top-level AS, the instance descriptors also need to be stored in GPU
-	// memory. This call outputs the memory requirements for each (scratch,
-	// results, instance descriptors) so that the application can allocate the
-	// corresponding memory
-	UINT64 scratchSize, resultSize, instanceDescSize;
-
-	m_topLevelASGenerator.ComputeASBufferSizes(m_device.Get(), true, &scratchSize,
-	                                           &resultSize, &instanceDescSize);
-
-	// Create the scratch and result buffers. Since the build is all done on GPU,
-	// those can be allocated on the default heap
-	m_topLevelASBuffers.pScratch = nv_helpers_dx12::CreateBuffer(
-		m_device.Get(), scratchSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-		nv_helpers_dx12::kDefaultHeapProps);
-	m_topLevelASBuffers.pResult = nv_helpers_dx12::CreateBuffer(
-		m_device.Get(), resultSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
-		nv_helpers_dx12::kDefaultHeapProps);
-
-	// The buffer describing the instances: ID, shader binding information,
-	// matrices ... Those will be copied into the buffer by the helper through
-	// mapping, so the buffer has to be allocated on the upload heap.
-	m_topLevelASBuffers.pInstanceDesc = nv_helpers_dx12::CreateBuffer(
-		m_device.Get(), instanceDescSize, D3D12_RESOURCE_FLAG_NONE,
-		D3D12_RESOURCE_STATE_GENERIC_READ, nv_helpers_dx12::kUploadHeapProps);
-
-	// After all the buffers are allocated, or if only an update is required, we
-	// can build the acceleration structure. Note that in the case of the update
-	// we also pass the existing AS as the 'previous' AS, so that it can be
-	// refitted in place.
-	m_topLevelASGenerator.Generate(m_commandList.Get(),
-	                               m_topLevelASBuffers.pScratch.Get(),
-	                               m_topLevelASBuffers.pResult.Get(),
-	                               m_topLevelASBuffers.pInstanceDesc.Get());
-}
 void RevEngineMain::CreateTopLevelAS()
 {
 		// Gather all the instances into the builder helper
@@ -1078,7 +951,7 @@ void RevEngineMain::CreateDepthBuffer()
 	D3D12_HEAP_PROPERTIES depthHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
 	D3D12_RESOURCE_DESC depthResourceDesc =
-      CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_width, m_height, 1, 1);
+      CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_windowData.m_width, m_windowData.m_height, 1, 1);
 	depthResourceDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 	// The depth values will be initialized to 1
@@ -1102,7 +975,7 @@ void RevEngineMain::CreateDepthBuffer()
 // Helper function for setting the window's title text.
 void RevEngineMain::SetCustomWindowText(LPCWSTR text)
 {
-	std::wstring windowText = m_title + L": " + text;
+	std::wstring windowText = m_windowData.m_title + L": " + text;
 	SetWindowText(Win32Application::GetHwnd(), windowText.c_str());
 }
 
