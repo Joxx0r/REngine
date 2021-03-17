@@ -123,6 +123,8 @@
     <ClInclude Include="Core\RevModelManager.h" />
     <ClInclude Include="Core\RevModelTypes.h" />
     <ClInclude Include="Core\RevScene.h" />
+    <ClInclude Include="Core\RevShaderManager.h" />
+    <ClInclude Include="Core\RevShaderTypes.h" />
     <ClInclude Include="D3D\RevD3DTypes.h" />
     <ClInclude Include="RevEngineMain.h" />
     <ClInclude Include="DXRHelper.h" />
@@ -542,6 +544,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Core\RevScene.cpp" />
+    <ClCompile Include="Core\RevShaderManager.cpp" />
     <ClCompile Include="D3D\RevD3DTypes.cpp" />
     <ClCompile Include="RevEngineMain.cpp" />
     <ClCompile Include="RaytracingPipelineGenerator.cpp">

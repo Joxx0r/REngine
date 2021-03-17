@@ -21,6 +21,7 @@
 #include "Core/RevModelManager.h"
 #include "Core/RevModelTypes.h"
 #include "Core/RevScene.h"
+#include "Core/RevShaderManager.h"
 
 RevEngineMain* RevEngineMain::s_instance = nullptr;
 
@@ -32,6 +33,7 @@ RevEngineMain::RevEngineMain(const RevWindowData& data)
 	m_assetsPath = assetsPath;
 	m_camera.Initialize(m_windowData.GetAspectRatio());
 	m_modelManager = new RevModelManager();
+	m_shaderManager = new RevShaderManager();
 }
 RevEngineMain* RevEngineMain::Construct(const RevWindowData& data)
 {
@@ -662,15 +664,12 @@ ComPtr<id3d12rootsignature> RevEngineMain::CreateMissSignature() const
 //
 void RevEngineMain::CreateRaytracingPipeline()
 {
+	m_shaderManager->Initialize();
 	nv_helpers_dx12::RayTracingPipelineGenerator pipeline(m_device.Get());
 
-	m_rayGenLibrary = nv_helpers_dx12::CompileShaderLibrary(L"shaders/RayGen.hlsl");
-	m_missLibrary = nv_helpers_dx12::CompileShaderLibrary(L"shaders/Miss.hlsl");
-	m_hitLibrary = nv_helpers_dx12::CompileShaderLibrary(L"shaders/Hit.hlsl");
-
-	pipeline.AddLibrary(m_rayGenLibrary.Get(), {L"RayGen"});
-	pipeline.AddLibrary(m_missLibrary.Get(), {L"Miss"});
-	pipeline.AddLibrary(m_hitLibrary.Get(), {L"ClosestHit", L"PlaneClosestHit"});
+	pipeline.AddLibrary(m_shaderManager->GetBlob(L"shaders/RayGen.hlsl"), {L"RayGen"});
+	pipeline.AddLibrary(m_shaderManager->GetBlob(L"shaders/Miss.hlsl"), {L"Miss"});
+	pipeline.AddLibrary(m_shaderManager->GetBlob(L"shaders/Hit.hlsl"), {L"ClosestHit", L"PlaneClosestHit"});
 
 	m_rayGenSignature = CreateRayGenSignature();
 	m_missSignature = CreateMissSignature();

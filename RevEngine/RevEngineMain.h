@@ -18,6 +18,7 @@
 #include "Core/RevEngineManager.h"
 #include "Core/RevModel.h"
 #include "Core/RevModelManager.h"
+#include "Core/RevShaderManager.h"
 #include "Misc/RevTypes.h"
 
 class RevScene;
@@ -27,6 +28,7 @@ using Microsoft::WRL::ComPtr;
 
 class RevInstanceManager;
 class RevModelManager;
+class RevShaderManager;
 
 #define id3d12resource ID3D12Resource
 #define id3d12rootsignature ID3D12RootSignature
@@ -120,10 +122,6 @@ public:
     UINT m_rtvDescriptorSize;
     bool m_raster = false;
 
-    ComPtr<idxcblob> m_rayGenLibrary;
-    ComPtr<idxcblob> m_hitLibrary;
-    ComPtr<idxcblob> m_missLibrary;
-
     ComPtr<id3d12rootsignature> m_rayGenSignature;
     ComPtr<id3d12rootsignature> m_hitSignature;
     ComPtr<id3d12rootsignature> m_missSignature;
@@ -159,6 +157,7 @@ public:
     std::wstring m_assetsPath;
 
     RevModelManager* m_modelManager;
+    RevShaderManager* m_shaderManager;
     std::vector<RevEngineManager*> m_managers;
 
 
