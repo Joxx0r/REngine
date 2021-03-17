@@ -43,6 +43,7 @@ class RevModelManager;
 class RevEngineMain
 {
 public:
+    virtual ~RevEngineMain() = default;
     RevEngineMain(UINT width, UINT height, std::wstring name);
 
     static RevEngineMain* Construct(const UINT width, const UINT height,const std::wstring name);
