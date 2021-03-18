@@ -120,6 +120,7 @@
     <ClInclude Include="Core\RevInstance.h" />
     <ClInclude Include="Core\RevInstanceManager.h" />
     <ClInclude Include="Core\RevModel.h" />
+    <ClInclude Include="Core\RevModelConstructionFunctions.h" />
     <ClInclude Include="Core\RevModelManager.h" />
     <ClInclude Include="Core\RevModelTypes.h" />
     <ClInclude Include="Core\RevScene.h" />
@@ -476,6 +477,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Core\RevModelConstructionFunctions.cpp" />
     <ClCompile Include="Core\RevModelManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

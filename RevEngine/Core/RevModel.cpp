@@ -2,6 +2,7 @@
 #include "RevModel.h"
 #include "RevCoreDefines.h"
 #include "RevEngineRetrievalFunctions.h"
+#include "RevModelConstructionFunctions.h"
 #include "RevModelTypes.h"
 #include "../BottomLevelASGenerator.h"
 
@@ -12,34 +13,14 @@ void RevModel::Initialize(RevEModelType type, REV_ID_HANDLE handle)
     if(type == RevEModelType::Triangle)
     {
     	RevVertInitializationData initData = {};
-        {
-            // Define the geometry for a triangle.
-            initData.m_generatedData.m_vertexes = {
-                {{sqrtf(8.f / 9.f), 0.f, -1.f / 3.f}, {1.f, 0.f, 0.f, 1.f}},
-{{-sqrtf(2.f / 9.f), sqrtf(2.f / 3.f), -1.f / 3.f}, {0.f, 1.f, 0.f, 1.f}},
-{{-sqrtf(2.f / 9.f), -sqrtf(2.f / 3.f), -1.f / 3.f}, {0.f, 0.f, 1.f, 1.f}},
-{{0.f, 0.f, 1.f}, {1, 0, 1, 1}}};
-        }
-        {
-            initData.m_generatedData.m_indices = {0, 1, 2, 0, 3, 1, 0, 2, 3, 1, 3, 2};
-        }
+        initData.m_generatedData = RevModelConstructionFunctions::CreateTriangleData();
     	m_baseData = RevVertIndexData::Create(initData);
     }
     else
     if(type == RevEModelType::Plane)
     {
     	RevVertInitializationData initData = {};
-	    {
-		    // Define the geometry for a plane.
-    		initData.m_generatedData.m_vertexes = {
-    			{{-1.5f, -.8f, 01.5f}, {1.0f, 1.0f, 1.0f, 1.0f}}, // 0
-                {{-1.5f, -.8f, -1.5f}, {1.0f, 1.0f, 1.0f, 1.0f}}, // 1
-                {{01.5f, -.8f, 01.5f}, {1.0f, 1.0f, 1.0f, 1.0f}}, // 2
-                {{01.5f, -.8f, 01.5f}, {1.0f, 1.0f, 1.0f, 1.0f}}, // 2
-                {{-1.5f, -.8f, -1.5f}, {1.0f, 1.0f, 1.0f, 1.0f}}, // 1
-                {{01.5f, -.8f, -1.5f}, {1.0f, 1.0f, 1.0f, 1.0f}}  // 4
-    		};
-	    }
+    	initData.m_generatedData = RevModelConstructionFunctions::CreatePlaneData();
     	m_baseData = RevVertIndexData::Create(initData);
     }
 	else
