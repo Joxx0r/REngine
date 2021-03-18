@@ -12,10 +12,10 @@ RevShaderManager* GetShaderManagerInternal()
 
 void RevShaderManager::Initialize()
 {
-    AddRasterizerShader( L"Shaders/Shaders.hlsl");
-    AddShaderLibrary(L"shaders/RayGen.hlsl");
-    AddShaderLibrary(L"shaders/Miss.hlsl");
-    AddShaderLibrary(L"shaders/Hit.hlsl");
+    AddRasterizerShader( L"Data//Shaders//Shaders.hlsl");
+    AddShaderLibrary(L"Data//Shaders//RayGen.hlsl");
+    AddShaderLibrary(L"Data//Shaders//Miss.hlsl");
+    AddShaderLibrary(L"Data//Shaders//Hit.hlsl");
 }
 
 RevShaderLibrary* RevShaderManager::GetShaderLibrary(const std::wstring& path, bool loadIfNotExisting /*= true*/)
@@ -31,7 +31,7 @@ RevShaderLibrary* RevShaderManager::GetShaderLibrary(const std::wstring& path, b
     {
         if(loadIfNotExisting)
         {
-            library = shaderManager->AddShaderLibrary(path);
+           return shaderManager->AddShaderLibrary(path);
         }
         return nullptr;
     }

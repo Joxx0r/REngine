@@ -211,7 +211,7 @@ void RevEngineMain::LoadAssets()
 	// Create the pipeline state, which includes compiling and loading shaders.
 	{
 
-		const std::wstring shader_path = L"Shaders/Shaders.hlsl";
+		const std::wstring shader_path = L"Data//Shaders//Shaders.hlsl";
 		RevShaderRasterizer* rasterizer = m_shaderManager->GetShaderRasterizer(shader_path);
 		// Define the vertex input layout.
 		D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
@@ -652,9 +652,9 @@ void RevEngineMain::CreateRaytracingPipeline()
 	m_shaderManager->Initialize();
 	nv_helpers_dx12::RayTracingPipelineGenerator pipeline(m_device.Get());
 
-	pipeline.AddLibrary(RevShaderManager::GetShaderLibrary(L"shaders/RayGen.hlsl")->m_blob, {L"RayGen"});
-	pipeline.AddLibrary(RevShaderManager::GetShaderLibrary(L"shaders/Miss.hlsl")->m_blob, {L"Miss"});
-	pipeline.AddLibrary(RevShaderManager::GetShaderLibrary(L"shaders/Hit.hlsl")->m_blob, {L"ClosestHit", L"PlaneClosestHit"});
+	pipeline.AddLibrary(RevShaderManager::GetShaderLibrary(L"Data//Shaders//RayGen.hlsl")->m_blob, {L"RayGen"});
+	pipeline.AddLibrary(RevShaderManager::GetShaderLibrary(L"Data/Shaders//Miss.hlsl")->m_blob, {L"Miss"});
+	pipeline.AddLibrary(RevShaderManager::GetShaderLibrary(L"Data//Shaders//Hit.hlsl")->m_blob, {L"ClosestHit", L"PlaneClosestHit"});
 
 	m_rayGenSignature = CreateRayGenSignature();
 	m_missSignature = CreateMissSignature();

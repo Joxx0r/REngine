@@ -46,5 +46,4 @@ void RevInstanceManager::DrawInstances()
         assert(instance);
         instance->DrawInstance();
     }
-}
-        
+}        
