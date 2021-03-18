@@ -24,9 +24,21 @@
 *.lai
 *.la
 *.a
-*.lib
 
 # Executables
 *.exe
 *.out
 *.app
+*.VC.db
+*.suo
+*.editorconfig
+*.tlog
+*.lastbuildstate
+*.vcxproj.FileListAbsolute.txt
+*.vcxproj.user
+*.recipe
+*.ilk
+*.pdb
+*.log
+*.ibd
+*.idb
