@@ -3,6 +3,7 @@
 #include "RevCoreDefines.h"
 #include "RevEngineRetrievalFunctions.h"
 #include "RevModel.h"
+#include "RevModelConstructionFunctions.h"
 
 RevModelManager* GetModelManagerInternal()
 {
@@ -60,7 +61,7 @@ RevModel* RevModelManager::CreateModelInternal(RevEModelType desiredType)
 {
     RevModel* model = new RevModel();
     m_modelCounter++;
-    model->Initialize(desiredType,m_modelCounter);
+    model->Initialize(RevModelConstructionFunctions::CreateModelDataType(desiredType),m_modelCounter);
     m_models.push_back(model);
     return model;
 }
@@ -84,7 +85,7 @@ RevModel* RevModelManager::FindModelTypeInternal(RevEModelType desiredType)
     for(int index = 0; index < m_models.size(); index++)
     {
         assert(m_models[index]);
-        if(m_models[index]->m_type == desiredType)
+        if(m_models[index]->m_modelData.m_type == desiredType)
         {
             return m_models[index];
         }

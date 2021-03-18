@@ -5,6 +5,7 @@ class RevModelConstructionFunctions
 {
 public:
     
+    static RevModelData CreateModelDataType(RevEModelType type);
     static RevModelData CreateTriangleData();
     static RevModelData CreatePlaneData();
     

@@ -2,9 +2,24 @@
 #include "RevModelConstructionFunctions.h"
 #include "../D3D/RevD3DTypes.h"
 
+RevModelData RevModelConstructionFunctions::CreateModelDataType(RevEModelType type)
+{
+    if(type == RevEModelType::Triangle)
+    {
+        return RevModelConstructionFunctions::CreateTriangleData();
+    }
+    else
+    if(type == RevEModelType::Plane)
+    {
+        return RevModelConstructionFunctions::CreatePlaneData();
+    }
+    return RevModelData();
+}
+
 RevModelData RevModelConstructionFunctions::CreateTriangleData()
 {
     RevModelData returnData = {};
+    returnData.m_type = RevEModelType::Triangle;
     returnData.m_vertexes = {
         {{sqrtf(8.f / 9.f), 0.f, -1.f / 3.f}, {1.f, 0.f, 0.f, 1.f}},
         {{-sqrtf(2.f / 9.f), sqrtf(2.f / 3.f), -1.f / 3.f}, {0.f, 1.f, 0.f, 1.f}},
@@ -21,6 +36,7 @@ RevModelData RevModelConstructionFunctions::CreateTriangleData()
 RevModelData RevModelConstructionFunctions::CreatePlaneData()
 {
     RevModelData returnData = {};
+    returnData.m_type = RevEModelType::Plane;
     returnData.m_vertexes = {
         {{-1.5f, -.8f, 1.5f}, {1.0f, 1.0f, 1.0f, 1.0f}}, // 0
         {{-1.5f, -.8f, -1.5f}, {1.0f, 1.0f, 1.0f, 1.0f}}, // 1

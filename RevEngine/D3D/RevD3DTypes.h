@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "../Core/RevCoreDefines.h"
 #include "../Core/RevModelTypes.h"
 
 using Microsoft::WRL::ComPtr;
@@ -15,6 +16,7 @@ struct RevModelData
 {
     std::vector<Vertex> m_vertexes;
     std::vector<UINT> m_indices;
+    RevEModelType m_type = RevEModelType::Invalid;
     
     int GetIndexSize() { return m_indices.size() * sizeof(UINT); }
     int GetVertexSize(){ return m_vertexes.size() * sizeof(Vertex); }
@@ -26,22 +28,10 @@ struct RevModelD3DData
     D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
     ComPtr<ID3D12Resource> m_indexBuffer;
     D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
-};
-
-
-struct RevVertInitializationData
-{
-    RevModelData m_generatedData;
-};
     
-struct RevVertIndexData
-{
-    RevModelData m_modelData;
-    RevModelD3DData m_d3dData;
+    int m_vertexCount = REV_INDEX_NONE;
+    int m_indexCount = REV_INDEX_NONE;
 
-    static RevVertIndexData Create(const RevVertInitializationData& data);
-    static AccelerationStructureBuffers CreateAccelerationStructure(
-            const RevVertIndexData& inData); 
-    
+    static RevModelD3DData Create(const RevModelData& data);
+    static AccelerationStructureBuffers CreateAccelerationStructure(const RevModelD3DData& inData); 
 };
-

@@ -13,14 +13,15 @@ class RevModel
 public:
     RevModel() {};
 
-    void Initialize(RevEModelType type, REV_ID_HANDLE handle);
+    void Initialize(const RevModelData& modelData, REV_ID_HANDLE handle);
 
     void DrawRasterized() const;
     
     AccelerationStructureBuffers CreateStructureBuffer(); 
     
-    RevVertIndexData m_baseData;
     AccelerationStructureBuffers m_relevantBuffers;
+    RevModelD3DData m_d3dData;
+    RevModelData m_modelData;
 
     RevEModelType m_type;
     REV_ID_HANDLE m_handle = REV_INDEX_NONE;
