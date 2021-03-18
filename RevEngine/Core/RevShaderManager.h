@@ -9,13 +9,19 @@ class RevShaderManager
 public:
     void Initialize();
 
-    std::map<std::wstring, RevShaderBase> m_pathToShader;
-    std::map<std::wstring, RevShaderLibrary> m_pathToShaderLibrary;
-
-    IDxcBlob* GetBlob(const std::wstring& path, bool loadIfNotExisting = true );
+    static RevShaderLibrary* GetShaderLibrary(const std::wstring& path, bool loadIfNotExisting = true );
+    static RevShaderRasterizer* GetShaderRasterizer(const std::wstring& path, bool loadIfNotExisting = true );
 
 private:
 
-    IDxcBlob* LoadShaderLibrary(std::wstring path);
+    RevShaderLibrary* AddShaderLibrary(std::wstring path);
+    RevShaderRasterizer* AddRasterizerShader(std::wstring path);
+    
+    static RevShaderLibrary* LoadShaderLibrary(std::wstring path);
+    static RevShaderRasterizer* LoadRasterizerShader(std::wstring shaderPath);
+
+    std::map<std::wstring, RevShaderRasterizer*> m_pathToShaderRaster;
+    std::map<std::wstring, RevShaderLibrary*> m_pathToShaderLibrary;
+    
 };
 

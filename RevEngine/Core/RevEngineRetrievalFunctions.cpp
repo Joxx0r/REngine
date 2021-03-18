@@ -24,6 +24,11 @@ RevInstanceManager* RevEngineRetrievalFunctions::GetInstanceManager()
     RETURN_ASSERT_NULL(GetScene()->m_instanceManager);
 }
 
+RevShaderManager* RevEngineRetrievalFunctions::GetShaderManager()
+{
+    RETURN_ASSERT_NULL(RevEngineMain::Get()->m_shaderManager);
+}
+
 ID3D12Device5* RevEngineRetrievalFunctions::GetDevice()
 {
     RETURN_ASSERT_NULL(RevEngineMain::Get()->m_device.Get());

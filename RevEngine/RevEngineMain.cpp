@@ -210,25 +210,9 @@ void RevEngineMain::LoadAssets()
 
 	// Create the pipeline state, which includes compiling and loading shaders.
 	{
-		ComPtr<ID3DBlob> vertexShader;
-		ComPtr<ID3DBlob> pixelShader;
-
-#if defined(_DEBUG)
-		// Enable better shader debugging with the graphics debugging tools.
-		UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-    UINT compileFlags = 0;
-#endif
 
 		const std::wstring shader_path = L"Shaders/Shaders.hlsl";
-
-		ThrowIfFailed(D3DCompileFromFile(shader_path.c_str(),
-		                                 nullptr, nullptr, "VSMain", "vs_5_0",
-		                                 compileFlags, 0, &vertexShader, nullptr));
-		ThrowIfFailed(D3DCompileFromFile(shader_path.c_str(),
-		                                 nullptr, nullptr, "PSMain", "ps_5_0",
-		                                 compileFlags, 0, &pixelShader, nullptr));
-
+		RevShaderRasterizer* rasterizer = m_shaderManager->GetShaderRasterizer(shader_path);
 		// Define the vertex input layout.
 		D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
 			{
@@ -245,8 +229,8 @@ void RevEngineMain::LoadAssets()
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 		psoDesc.InputLayout = {inputElementDesc, _countof(inputElementDesc)};
 		psoDesc.pRootSignature = m_rootSignature.Get();
-		psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
-		psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
+		psoDesc.VS = CD3DX12_SHADER_BYTECODE(rasterizer->m_vertexShader.Get());
+		psoDesc.PS = CD3DX12_SHADER_BYTECODE(rasterizer->m_pixelShader.Get());
 		psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		psoDesc.DepthStencilState.DepthEnable = FALSE;
@@ -667,9 +651,9 @@ void RevEngineMain::CreateRaytracingPipeline()
 	m_shaderManager->Initialize();
 	nv_helpers_dx12::RayTracingPipelineGenerator pipeline(m_device.Get());
 
-	pipeline.AddLibrary(m_shaderManager->GetBlob(L"shaders/RayGen.hlsl"), {L"RayGen"});
-	pipeline.AddLibrary(m_shaderManager->GetBlob(L"shaders/Miss.hlsl"), {L"Miss"});
-	pipeline.AddLibrary(m_shaderManager->GetBlob(L"shaders/Hit.hlsl"), {L"ClosestHit", L"PlaneClosestHit"});
+	pipeline.AddLibrary(RevShaderManager::GetShaderLibrary(L"shaders/RayGen.hlsl")->m_blob, {L"RayGen"});
+	pipeline.AddLibrary(RevShaderManager::GetShaderLibrary(L"shaders/Miss.hlsl")->m_blob, {L"Miss"});
+	pipeline.AddLibrary(RevShaderManager::GetShaderLibrary(L"shaders/Hit.hlsl")->m_blob, {L"ClosestHit", L"PlaneClosestHit"});
 
 	m_rayGenSignature = CreateRayGenSignature();
 	m_missSignature = CreateMissSignature();
