@@ -18,13 +18,13 @@ class RevInstanceManager : public RevEngineManager
 public:
     RevInstanceManager() {};
 
-    void AddInstance(RevEModelType desiredType, DirectX::XMMATRIX transform);
-
-    void AddAllInstancesToSBT(  nv_helpers_dx12::TopLevelASGenerator* generator);
+    static void AddInstance(RevEModelType desiredType, DirectX::XMMATRIX transform);
+    static void AddAllInstancesToSBT(  nv_helpers_dx12::TopLevelASGenerator* generator);
     
     void DrawInstances();
-    
 
+private:
+    
     std::vector<RevInstance*> m_instances;
     
 };

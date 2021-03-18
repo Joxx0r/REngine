@@ -8,7 +8,7 @@ class RevScene
 {
 public:
 
-    void Initialize(RevEngineMain* manager);
+    void Initialize();
 
     void DrawScene();
     

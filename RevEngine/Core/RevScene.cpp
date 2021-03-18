@@ -3,7 +3,7 @@
 #include "RevModelTypes.h"
 #include "../RevEngineMain.h"
 
-void RevScene::Initialize(RevEngineMain* manager)
+void RevScene::Initialize()
 {
     m_instanceManager = new RevInstanceManager();
     m_instanceManager->AddInstance(RevEModelType::Triangle,  XMMatrixTranslation(.6f, 0, 0));

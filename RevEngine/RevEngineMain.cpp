@@ -578,10 +578,11 @@ void RevEngineMain::CreateTopLevelAS()
 void RevEngineMain::CreateAccelerationStructures()
 {
 	m_scene = new RevScene();
-	m_scene->Initialize(this);
-
+	m_scene->Initialize();
+	
+	RevModelManager::GenerateAccelerationBuffersAllModels();
+	
 	// Build the bottom AS from the Triangle vertex buffer
-	m_modelManager->GenerateAccelerationBuffersAllModels();
 	CreateTopLevelAS();
 
 	// Flush the command list and wait for it to finish
