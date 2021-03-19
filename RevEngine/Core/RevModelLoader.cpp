@@ -60,7 +60,7 @@ void CreateBaseVertex(
 	outVertex->m_tangent = XMFLOAT3(tangent.x, tangent.y, tangent.z);
 }
 
-/*
+
 void LoadIndecies(const aiMesh* mesh, std::vector<UINT> &indices)
 {
 	for (UINT vertIndex = 0; vertIndex < mesh->mNumFaces; vertIndex++)
@@ -92,7 +92,7 @@ aiNode* FindNodeRecursive(aiNode* node, const char* name)
 
 	return nullptr;
 }
-
+/*
 
 void LoadTexturePaths(
 		const aiMesh* mesh, 
@@ -359,10 +359,10 @@ void LoadAnimatedModel(const struct aiScene* scene, RevModel* newModel, const ch
 
 }
 */
-void LoadNormalModel(const struct aiScene* scene, RevModelData& outModelData, const char* path)
+void LoadNormalModel(const struct aiScene* scene, RevModelData& outModelData, const std::wstring& path)
 {
 #if USE_ASSIMP
-/*	bool foundFile = false;
+	bool foundFile = false;
 	for (UINT meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
 	{
 		const aiMesh* mesh = scene->mMeshes[meshIndex];
@@ -376,15 +376,11 @@ void LoadNormalModel(const struct aiScene* scene, RevModelData& outModelData, co
 				outModelData.m_staticVertexes.push_back(staticVert);
 			}
 
-			LoadIndecies(mesh, &initializationData.indices, initializationData.m_nIndices);
-			LoadTexturePaths(mesh, scene, initializationData.m_textureInitialization, path);
+			LoadIndecies(mesh, outModelData.m_indices);
+		//	LoadTexturePaths(mesh, scene, initializationData.m_textureInitialization, path);
 		}
 	}
 
-	RevEngineFunctions::CreateNormalModelGeometry(
-		initializationData,
-		newModel->m_modelData);
-*/
 	/*{
 		RevArchiveSaver saver;
 
@@ -404,7 +400,7 @@ void LoadNormalModel(const struct aiScene* scene, RevModelData& outModelData, co
 #endif
 }
 
-RevModel* RevModelLoader::LoadModel(const char* path)
+RevModel* RevModelLoader::LoadModel(const std::wstring& path)
 {
 	ID3D12GraphicsCommandList* commandList = RevEngineRetrievalFunctions::GetCommandList();
 	ThrowIfFailed(commandList->Reset(RevEngineRetrievalFunctions::GetCommandAllocator(), nullptr));
@@ -415,9 +411,9 @@ RevModel* RevModelLoader::LoadModel(const char* path)
 	RevEModelType type = RevEModelType::ModelStatic;
 
 	bool loadedBinary = false;
-	std::string modelPath(path);
+	std::wstring modelPath(path);
 	modelPath = modelPath.substr(0, modelPath.find_last_of('.'));
-	modelPath.append("_MODEL.rrev");
+	modelPath.append(L"_MODEL.rrev");
 
 #if DO_LOAING_BINARY
 	if (PathFileExists(modelPath.c_str()))
@@ -457,7 +453,10 @@ RevModel* RevModelLoader::LoadModel(const char* path)
 #endif
 	{
 #if USE_ASSIMP
-		const struct aiScene* scene = aiImportFile(path, 0);
+		char output[256];
+		const WCHAR* wc =path.c_str();
+		sprintf_s(&output[0], 256, "%ws", wc);
+		const struct aiScene* scene = aiImportFile(output, 0);
 		assert(scene);
 		modelData.m_type = scene->HasAnimations() ? RevEModelType::ModelAnimated : RevEModelType::ModelStatic;
 		if (modelData.m_type == RevEModelType::ModelStatic)
@@ -480,4 +479,73 @@ RevModel* RevModelLoader::LoadModel(const char* path)
 	// Wait until initialization is complete.
 	RevEngineExecutionFunctions::FlushCommandQueue();
 	return newModel;
+}
+
+RevModelData RevModelLoader::CreateModelDataFromFile(const std::wstring& path)
+{
+	RevModelData modelData = {};
+
+	RevEModelType type = RevEModelType::ModelStatic;
+	bool loadedBinary = false;
+	std::wstring modelPath(path);
+	modelPath = modelPath.substr(0, modelPath.find_last_of('.'));
+	modelPath.append(L"_MODEL.rrev");
+
+#if DO_LOAING_BINARY
+	if (PathFileExists(modelPath.c_str()))
+	{
+		std::fstream fstream;
+		fstream.open(modelPath.c_str(), std::ios_base::in | std::ios_base::binary);
+		if (fstream.is_open())
+		{
+			UINT size = 0;
+			fstream >> size;
+
+			RevArchiveLoader loader(size);
+			fstream.read((char*)loader.m_byteArray, size);
+			loader << type;
+			if (type == RevModelType::Animated)
+			{
+				RevAnimatedNodelInitializationData initData = {};
+				initData.Serialize(loader);
+				RevEngineFunctions::CreateAnimatedModelGeometry(
+                    initData,
+                    newModel->m_modelData);
+			}
+			else
+			{
+				RevNormalModelInitializationData initData = {};
+				initData.Serialize(loader);
+				RevEngineFunctions::CreateNormalModelGeometry(
+                    initData,
+                    newModel->m_modelData);
+			}
+
+			fstream.close();
+			loader.Delete();
+		}
+	}
+	else
+#endif
+	{
+#if USE_ASSIMP
+		char output[256];
+		const WCHAR* wc =path.c_str();
+		sprintf_s(&output[0], 256, "%ws", wc);
+		const struct aiScene* scene = aiImportFile(output, 0);
+		assert(scene);
+		modelData.m_type = scene->HasAnimations() ? RevEModelType::ModelAnimated : RevEModelType::ModelStatic;
+		if (modelData.m_type == RevEModelType::ModelStatic)
+		{
+			LoadNormalModel(scene, modelData, path);
+		}
+		else
+		{
+			//	LoadAnimatedModel(scene, newModel, path);
+		}
+#else
+		assert(0 && "Not using assimp and dont have proepr context");
+#endif
+	}
+	return modelData;
 }

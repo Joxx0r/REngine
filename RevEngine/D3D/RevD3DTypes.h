@@ -79,9 +79,11 @@ struct RevModelD3DData
     D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
     ComPtr<ID3D12Resource> m_indexBuffer;
     D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
+    ComPtr<ID3D12RootSignature> m_rootSignature;
     
     int m_vertexCount = REV_INDEX_NONE;
     int m_indexCount = REV_INDEX_NONE;
+    int m_vertexStride = REV_INDEX_NONE;
 
     static RevModelD3DData Create(const RevModelData& data);
     static AccelerationStructureBuffers CreateAccelerationStructure(const RevModelD3DData& inData); 

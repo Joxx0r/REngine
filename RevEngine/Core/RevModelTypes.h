@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <string>
 
 struct RevVertexPosCol
 {
@@ -15,6 +16,7 @@ struct RevVertexPosTexNormBiTan
     DirectX::XMFLOAT3 m_tangent;
 };
 
+
 enum RevEModelType : UINT8
 {
     Invalid,
@@ -22,4 +24,26 @@ enum RevEModelType : UINT8
     Plane,
     ModelStatic,
     ModelAnimated
+};
+
+struct RevModelRetrievalData
+{
+    RevModelRetrievalData()
+    {
+        m_type = RevEModelType::Invalid;
+    }
+
+    RevModelRetrievalData(std::wstring path)
+    {
+        m_type = ModelStatic;
+        m_path = path;
+    }
+    RevModelRetrievalData(RevEModelType type)
+    {
+        m_type = type;
+        m_path = L"";
+    }
+    
+    std::wstring m_path;
+    RevEModelType m_type;
 };

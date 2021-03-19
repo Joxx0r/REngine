@@ -11,6 +11,7 @@ RevModelD3DData RevModelD3DData::Create(const RevModelData& data)
     RevModelD3DData returnData = {};
 	ID3D12Device5* device = RevEngineRetrievalFunctions::GetDevice();
 	returnData.m_vertexCount = data.GetNumVertexes();
+	returnData.m_vertexStride = data.GetVertexStride();
     if(returnData.m_vertexCount > 0)
     {
         const UINT vertexBufferSize =  data.GetModelVertexSize();
@@ -82,7 +83,7 @@ AccelerationStructureBuffers RevModelD3DData::CreateAccelerationStructure(const 
 			int numVertex = inData.m_vertexCount;
 			int numIndicies = inData.m_indexCount;
 			bottomLevelAS.AddVertexBuffer(inData.m_vertexBuffer.Get(), 0,
-                               numVertex, sizeof(RevVertexPosCol),
+                               numVertex, inData.m_vertexStride,
                                inData.m_indexBuffer.Get(), 0,
                                numIndicies, nullptr, 0, true);	
 		}
@@ -90,7 +91,7 @@ AccelerationStructureBuffers RevModelD3DData::CreateAccelerationStructure(const 
 		{
 			int numVertex = inData.m_vertexCount;
 			bottomLevelAS.AddVertexBuffer(inData.m_vertexBuffer.Get(), 0,
-                                          numVertex, sizeof(RevVertexPosCol), 0,
+                                          numVertex, inData.m_vertexStride, 0,
                                           0);
 		}
 	}

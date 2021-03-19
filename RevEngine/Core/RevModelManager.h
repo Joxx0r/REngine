@@ -2,6 +2,7 @@
 
 #include "RevCoreDefines.h"
 #include "RevEngineManager.h"
+#include "RevModelTypes.h"
 
 enum RevEModelType : UINT8;
 class RevModel;
@@ -12,16 +13,16 @@ public:
     RevModelManager() {};
 
     /** Finds a model (or tries loading it if desired). */
-    static RevModel* FindModel(RevEModelType desiredType, bool loadIfNotFound = true);
+    static RevModel* FindModel(RevModelRetrievalData desiredType, bool loadIfNotFound = true);
     static RevModel* FindModelFromHandle(REV_ID_HANDLE handle);
-    static REV_ID_HANDLE FindModelHandleFromType(RevEModelType desiredType, bool loadIfNotFound = true);
+    static REV_ID_HANDLE FindModelHandleFromType(RevModelRetrievalData desiredType, bool loadIfNotFound = true);
 
     /** Generates all SBT models. */
     static void GenerateAccelerationBuffersAllModels();
 
 private:
 
-    RevModel* CreateModelInternal(RevEModelType desiredType);
+    RevModel* CreateModelInternal(RevModelRetrievalData desiredType);
 
     RevModel* FindModelTypeInternal(RevEModelType desiredType);
     RevModel* FindModelHandleInternal(REV_ID_HANDLE handle);

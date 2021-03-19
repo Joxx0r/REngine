@@ -10,20 +10,20 @@ RevModelManager* GetModelManagerInternal()
     return RevEngineRetrievalFunctions::GetModelManager();
 }
 
-RevModel* RevModelManager::FindModel(RevEModelType desiredType, bool loadIfNotFound /*= true*/)
+RevModel* RevModelManager::FindModel(RevModelRetrievalData desiredType, bool loadIfNotFound /*= true*/)
 {
     RevModelManager* modelManager = GetModelManagerInternal();
     if(!modelManager)
     {
         return nullptr;
     }
-    if(RevModel* model = modelManager->FindModelTypeInternal(desiredType))
+    if(RevModel* model = modelManager->FindModelTypeInternal(desiredType.m_type))
     {
         return model;
     }
     if(loadIfNotFound)
     {
-        return modelManager->CreateModelInternal(desiredType);
+        return modelManager->CreateModelInternal(desiredType.m_type);
     }
     return nullptr;
 }
@@ -37,7 +37,7 @@ RevModel* RevModelManager::FindModelFromHandle( REV_ID_HANDLE handle)
     return modelManager->FindModelHandleInternal(handle);
 }
 
-REV_ID_HANDLE RevModelManager::FindModelHandleFromType( RevEModelType desiredType, bool loadIfNotFound)
+REV_ID_HANDLE RevModelManager::FindModelHandleFromType( RevModelRetrievalData desiredType, bool loadIfNotFound)
 {
     RevModelManager* modelManager = GetModelManagerInternal();
     if(!modelManager)
@@ -45,7 +45,7 @@ REV_ID_HANDLE RevModelManager::FindModelHandleFromType( RevEModelType desiredTyp
         return REV_ID_NONE;
     }
     
-    if(RevModel* model = modelManager->FindModelTypeInternal(desiredType))
+    if(RevModel* model = modelManager->FindModelTypeInternal(desiredType.m_type))
     {
         return model->m_handle;
     }
@@ -57,7 +57,7 @@ REV_ID_HANDLE RevModelManager::FindModelHandleFromType( RevEModelType desiredTyp
     return REV_ID_NONE;
 }
 
-RevModel* RevModelManager::CreateModelInternal(RevEModelType desiredType)
+RevModel* RevModelManager::CreateModelInternal(RevModelRetrievalData desiredType)
 {
     RevModel* model = new RevModel();
     m_modelCounter++;

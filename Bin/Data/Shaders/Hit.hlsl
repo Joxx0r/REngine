@@ -20,7 +20,8 @@ void ClosestHit(inout HitInfo payload, Attributes attrib) {
   float3 barycentrics =
       float3(1.f - attrib.bary.x - attrib.bary.y, attrib.bary.x, attrib.bary.y);
 
-  float3 hitColor = A * barycentrics.x + B * barycentrics.y + C * barycentrics.z;
+  //float3 hitColor = A * barycentrics.x + B * barycentrics.y + C * barycentrics.z;
+  float3 hitColor = float3(1,1,1);
   payload.colorAndDistance = float4(hitColor, RayTCurrent());
 }
 

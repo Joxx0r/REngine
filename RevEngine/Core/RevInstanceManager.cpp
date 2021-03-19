@@ -9,7 +9,7 @@ RevInstanceManager* GetInstanceManagerInternal()
     return RevEngineRetrievalFunctions::GetInstanceManager();
 }
 
-void RevInstanceManager::AddInstance(RevEModelType desiredType,  DirectX::XMMATRIX transform)
+void RevInstanceManager::AddInstance(RevModelRetrievalData data,  DirectX::XMMATRIX transform)
 {
     RevInstanceManager* instanceManager = GetInstanceManagerInternal();
     if(!instanceManager)
@@ -17,7 +17,7 @@ void RevInstanceManager::AddInstance(RevEModelType desiredType,  DirectX::XMMATR
         return;
     }
     RevInstance* newInstance = new RevInstance();
-    newInstance->Initialize(desiredType, transform);
+    newInstance->Initialize(data, transform);
     instanceManager->m_instances.push_back(newInstance);
 }
 

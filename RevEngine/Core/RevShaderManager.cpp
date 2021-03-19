@@ -13,6 +13,7 @@ RevShaderManager* GetShaderManagerInternal()
 void RevShaderManager::Initialize()
 {
     AddRasterizerShader( L"Data//Shaders//Shaders.hlsl");
+    AddRasterizerShader( L"Data//Shaders//StaticModel.hlsl");
     AddShaderLibrary(L"Data//Shaders//RayGen.hlsl");
     AddShaderLibrary(L"Data//Shaders//Miss.hlsl");
     AddShaderLibrary(L"Data//Shaders//Hit.hlsl");
