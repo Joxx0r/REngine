@@ -35,33 +35,32 @@ std::string GetMaterialPath(aiMaterial* material, aiTextureType type, const char
 	return returnString;
 #endif
 }
+*/
 
 void CreateBaseVertex(
 		const aiMesh* mesh, 
 		UINT vertIndex, 
-		RevVertex* outVertex)
+		RevVertexPosTexNormBiTan* outVertex)
 {
 	aiVector3D vert = mesh->mVertices[vertIndex];
-	outVertex->m_location = RevVector3(vert.x, vert.y, vert.z);
-
+	outVertex->m_position = XMFLOAT3(vert.x, vert.y, vert.z);
 	for (UINT texCordIndex = 0; texCordIndex < mesh->mNumUVComponents[0]; texCordIndex++)
 	{
-		outVertex->m_tex[0] = (float)mesh->mTextureCoords[0][vertIndex].x;
-		outVertex->m_tex[1] = 1 - (float)mesh->mTextureCoords[0][vertIndex].y;
+		outVertex->m_tex.x = (float)mesh->mTextureCoords[0][vertIndex].x;
+		outVertex->m_tex.y = 1 - (float)mesh->mTextureCoords[0][vertIndex].y;
 	}
 
 	aiVector3D normal = mesh->mNormals[vertIndex];
-	outVertex->m_normal = RevVector3(normal.x, normal.y, normal.z);
+	outVertex->m_normal = XMFLOAT3(normal.x, normal.y, normal.z);
 
 	aiVector3D biNormal = mesh->mBitangents[vertIndex];
-	outVertex->m_biNormal = RevVector3(biNormal.x, biNormal.y, biNormal.z);
-
+	outVertex->m_binormal = XMFLOAT3(biNormal.x, biNormal.y, biNormal.z);
 
 	aiVector3D tangent = mesh->mTangents[vertIndex];
-	outVertex->m_tangent = RevVector3(tangent.x, tangent.y, tangent.z);
+	outVertex->m_tangent = XMFLOAT3(tangent.x, tangent.y, tangent.z);
 }
 
-
+/*
 void LoadIndecies(const aiMesh* mesh, std::vector<UINT> &indices)
 {
 	for (UINT vertIndex = 0; vertIndex < mesh->mNumFaces; vertIndex++)
@@ -359,24 +358,22 @@ void LoadAnimatedModel(const struct aiScene* scene, RevModel* newModel, const ch
 
 
 }
-void LoadNormalModel(const struct aiScene* scene, RevModel* newModel, const char* path)
+*/
+void LoadNormalModel(const struct aiScene* scene, RevModelData& outModelData, const char* path)
 {
 #if USE_ASSIMP
-	bool foundFile = false;
-
-	RevNormalModelInitializationData initializationData = {};
+/*	bool foundFile = false;
 	for (UINT meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
 	{
 		const aiMesh* mesh = scene->mMeshes[meshIndex];
 		if (mesh)
 		{
-			initializationData.m_nVertexes = mesh->mNumVertices;
-			initializationData.vertices = new RevVertex[initializationData.m_nVertexes];
+			outModelData.m_staticVertexes.reserve(mesh->mNumVertices);
 			for (UINT vertIndex = 0; vertIndex < mesh->mNumVertices; vertIndex++)
 			{
-				RevVertex vertexToUse = {};
-				CreateBaseVertex(mesh, vertIndex, &vertexToUse);
-				initializationData.vertices[vertIndex] = vertexToUse;
+				RevVertexPosTexNormBiTan staticVert = {};
+				CreateBaseVertex(mesh, vertIndex, &staticVert);
+				outModelData.m_staticVertexes.push_back(staticVert);
 			}
 
 			LoadIndecies(mesh, &initializationData.indices, initializationData.m_nIndices);
@@ -387,8 +384,8 @@ void LoadNormalModel(const struct aiScene* scene, RevModel* newModel, const char
 	RevEngineFunctions::CreateNormalModelGeometry(
 		initializationData,
 		newModel->m_modelData);
-
-	{
+*/
+	/*{
 		RevArchiveSaver saver;
 
 		std::string modelPath(path);
@@ -403,10 +400,9 @@ void LoadNormalModel(const struct aiScene* scene, RevModel* newModel, const char
 			fstream.write((const char*)saver.m_byteArray, saver.Tell());
 			fstream.close();
 		}
-	}
+	}*/
 #endif
 }
-*/
 
 RevModel* RevModelLoader::LoadModel(const char* path)
 {
@@ -466,7 +462,7 @@ RevModel* RevModelLoader::LoadModel(const char* path)
 		modelData.m_type = scene->HasAnimations() ? RevEModelType::ModelAnimated : RevEModelType::ModelStatic;
 		if (modelData.m_type == RevEModelType::ModelStatic)
 		{
-		//	LoadNormalModel(scene, newModel, path);
+			LoadNormalModel(scene, modelData, path);
 		}
 		else
 		{

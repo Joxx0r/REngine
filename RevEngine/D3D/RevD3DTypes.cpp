@@ -10,11 +10,10 @@ RevModelD3DData RevModelD3DData::Create(const RevModelData& data)
 {
     RevModelD3DData returnData = {};
 	ID3D12Device5* device = RevEngineRetrievalFunctions::GetDevice();
-    if(data.m_vertexes.size() > 0)
+	returnData.m_vertexCount = data.GetNumVertexes();
+    if(returnData.m_vertexCount > 0)
     {
-    	returnData.m_vertexCount = data.m_vertexes.size();
-        const UINT vertexBufferSize = sizeof(Vertex) * static_cast<UINT>(returnData.m_vertexCount);
-
+        const UINT vertexBufferSize =  data.GetModelVertexSize();
         // Note: using upload heaps to transfer static data like vert buffers is not
         // recommended. Every time the GPU needs it, the upload heap will be
         // marshalled over. Please read up on Default Heap usage. An upload heap is
@@ -34,12 +33,12 @@ RevModelD3DData RevModelD3DData::Create(const RevModelData& data)
             0, 0); // We do not intend to read from this resource on the CPU.
         ThrowIfFailed(returnData.m_vertexBuffer->Map(
             0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
-        memcpy(pVertexDataBegin, data.m_vertexes.data(), vertexBufferSize);
+        memcpy(pVertexDataBegin, data.GetData(), vertexBufferSize);
         returnData.m_vertexBuffer->Unmap(0, nullptr);
 
         // Initialize the vertex buffer view.
         returnData.m_vertexBufferView.BufferLocation = returnData.m_vertexBuffer->GetGPUVirtualAddress();
-        returnData.m_vertexBufferView.StrideInBytes = sizeof(Vertex);
+        returnData.m_vertexBufferView.StrideInBytes = data.GetVertexStride();
         returnData.m_vertexBufferView.SizeInBytes = vertexBufferSize;         
     }
     if(data.m_indices.size() > 0)
@@ -83,7 +82,7 @@ AccelerationStructureBuffers RevModelD3DData::CreateAccelerationStructure(const 
 			int numVertex = inData.m_vertexCount;
 			int numIndicies = inData.m_indexCount;
 			bottomLevelAS.AddVertexBuffer(inData.m_vertexBuffer.Get(), 0,
-                               numVertex, sizeof(Vertex),
+                               numVertex, sizeof(RevVertexPosCol),
                                inData.m_indexBuffer.Get(), 0,
                                numIndicies, nullptr, 0, true);	
 		}
@@ -91,7 +90,7 @@ AccelerationStructureBuffers RevModelD3DData::CreateAccelerationStructure(const 
 		{
 			int numVertex = inData.m_vertexCount;
 			bottomLevelAS.AddVertexBuffer(inData.m_vertexBuffer.Get(), 0,
-                                          numVertex, sizeof(Vertex), 0,
+                                          numVertex, sizeof(RevVertexPosCol), 0,
                                           0);
 		}
 	}
