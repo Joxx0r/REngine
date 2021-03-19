@@ -13,6 +13,10 @@ RevModelManager* RevEngineRetrievalFunctions::GetModelManager()
 {
     RETURN_ASSERT_NULL(RevEngineMain::Get()->m_modelManager);
 }
+RevEngineMain* RevEngineRetrievalFunctions::GetMain()
+{
+    RETURN_ASSERT_NULL(RevEngineMain::Get());
+}
 
 RevScene* RevEngineRetrievalFunctions::GetScene()
 {
@@ -37,4 +41,12 @@ ID3D12Device5* RevEngineRetrievalFunctions::GetDevice()
 ID3D12GraphicsCommandList4* RevEngineRetrievalFunctions::GetCommandList()
 {
     RETURN_ASSERT_NULL(RevEngineMain::Get()->m_commandList.Get());
+}
+ID3D12CommandAllocator* RevEngineRetrievalFunctions::GetCommandAllocator()
+{
+    RETURN_ASSERT_NULL(RevEngineMain::Get()->m_commandAllocator.Get());
+}
+ID3D12CommandQueue* RevEngineRetrievalFunctions::GetCommandQueue()
+{
+    RETURN_ASSERT_NULL(RevEngineMain::Get()->m_commandQueue.Get());
 }

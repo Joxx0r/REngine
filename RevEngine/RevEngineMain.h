@@ -53,6 +53,7 @@ public:
     
     void PopulateCommandList() const;
     void WaitForPreviousFrame();
+    void FlushCommandQueue();
     
     void CheckRaytracingSupport() const;
     

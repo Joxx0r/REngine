@@ -47,7 +47,7 @@
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_$(Configuration)</TargetName>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);D:\Code\RevEngine\ThirdParty\assimp\include\</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);D:\Code\RevEngine\ThirdParty\assimp\lib\</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);D:\Code\RevEngine\ThirdParty\assimp\lib\x64\</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -119,12 +119,14 @@
     <ClInclude Include="BottomLevelASGenerator.h" />
     <ClInclude Include="Core\RevCamera.h" />
     <ClInclude Include="Core\RevCoreDefines.h" />
+    <ClInclude Include="Core\RevEngineExecutionFunctions.h" />
     <ClInclude Include="Core\RevEngineManager.h" />
     <ClInclude Include="Core\RevEngineRetrievalFunctions.h" />
     <ClInclude Include="Core\RevInstance.h" />
     <ClInclude Include="Core\RevInstanceManager.h" />
     <ClInclude Include="Core\RevModel.h" />
     <ClInclude Include="Core\RevModelConstructionFunctions.h" />
+    <ClInclude Include="Core\RevModelLoader.h" />
     <ClInclude Include="Core\RevModelManager.h" />
     <ClInclude Include="Core\RevModelTypes.h" />
     <ClInclude Include="Core\RevScene.h" />
@@ -981,6 +983,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Core\RevEngineExecutionFunctions.cpp" />
     <ClCompile Include="Core\RevEngineManager.cpp" />
     <ClCompile Include="Core\RevEngineRetrievalFunctions.cpp" />
     <ClCompile Include="Core\RevInstance.cpp">
@@ -1185,6 +1188,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Core\RevModelConstructionFunctions.cpp" />
+    <ClCompile Include="Core\RevModelLoader.cpp" />
     <ClCompile Include="Core\RevModelManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

@@ -10,5 +10,7 @@ enum RevEModelType : UINT8
 {
     Invalid,
     Triangle,
-    Plane
+    Plane,
+    ModelStatic,
+    ModelAnimated
 };

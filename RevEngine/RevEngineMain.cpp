@@ -469,6 +469,20 @@ void RevEngineMain::WaitForPreviousFrame()
 
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 }
+void RevEngineMain::FlushCommandQueue()
+{
+	m_fenceValue++;
+
+	ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), m_fenceValue));
+
+	if (m_fence->GetCompletedValue() < m_fenceValue)
+	{
+		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+		ThrowIfFailed(m_fence->SetEventOnCompletion(m_fenceValue, eventHandle));
+		WaitForSingleObject(eventHandle, INFINITE);
+		CloseHandle(eventHandle);
+	}
+}
 
 void RevEngineMain::CheckRaytracingSupport() const
 {
