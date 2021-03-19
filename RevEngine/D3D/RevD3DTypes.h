@@ -12,11 +12,23 @@ struct AccelerationStructureBuffers
     ComPtr<ID3D12Resource> pInstanceDesc; // Hold the matrices of the instances
 };
 
+
+
+struct RevTextureCollection
+{
+    std::wstring m_diffusePath;
+    std::wstring m_normalTexturePath;
+    std::wstring m_substanceTexturePath;
+    std::wstring m_roughnessAOEmissivePath;
+    int m_numTextures = 0;
+};
+
 struct RevModelData
 {
     std::vector<RevVertexPosCol> m_vertexes;
     std::vector<RevVertexPosTexNormBiTan> m_staticVertexes;
     std::vector<UINT> m_indices;
+    RevTextureCollection m_textures;
     RevEModelType m_type = RevEModelType::Invalid;
     
     int GetModelIndexSize() const { return m_indices.size() * sizeof(UINT); }

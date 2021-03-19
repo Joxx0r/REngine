@@ -13,21 +13,25 @@
 
 #define USE_ASSIMP 1
 //path file exist
+#include <codecvt>
+#include <locale>
+
 #include "RevEngineExecutionFunctions.h"
 #include "RevEngineRetrievalFunctions.h"
 #include "Shlwapi.h"
 #include "../DXSampleHelper.h"
-/*
-std::string GetMaterialPath(aiMaterial* material, aiTextureType type, const char* basePath)
+
+std::wstring GetMaterialPath(aiMaterial* material, aiTextureType type, std::wstring basePath)
 {
 #if USE_ASSIMP
 	aiString str;
 	material->GetTexture(type, 0, &str);
-	std::string element = str.C_Str();
-	std::string data = element.substr(2, element.length() - 1);
-	std::string pathFile = basePath;
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	std::wstring element = converter.from_bytes(str.C_Str());
+	std::wstring data = element.substr(2, element.length() - 1);
+	std::wstring pathFile = basePath;
 	size_t elem = pathFile.find_last_of('\\');
-	std::string otherString = pathFile.substr(0, elem + 1);
+	std::wstring otherString = pathFile.substr(0, elem + 1);
 	otherString.append(data);
 	return otherString;
 #else
@@ -35,7 +39,7 @@ std::string GetMaterialPath(aiMaterial* material, aiTextureType type, const char
 	return returnString;
 #endif
 }
-*/
+
 
 void CreateBaseVertex(
 		const aiMesh* mesh, 
@@ -92,26 +96,24 @@ aiNode* FindNodeRecursive(aiNode* node, const char* name)
 
 	return nullptr;
 }
-/*
 
 void LoadTexturePaths(
 		const aiMesh* mesh, 
 		const struct aiScene* scene, 
-		RevTextureInitializationData& outData,
-		const char* path)
+		RevTextureCollection& outData,
+		const std::wstring& path)
 {
 #if USE_ASSIMP
-	outData.m_nTexturePaths = 0;
+	outData.m_numTextures = 0;
 	UINT numMaterial = mesh->mMaterialIndex;
 	if (mesh->mMaterialIndex >= 0)
 	{
-
-		outData.m_nTexturePaths = 4;
+		outData.m_numTextures = 4;
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		strcpy(outData.m_diffuseTexturePath, GetMaterialPath(material, aiTextureType_DIFFUSE, path).c_str());
-		strcpy(outData.m_normalTexturePath, GetMaterialPath(material, aiTextureType_NORMALS, path).c_str());
-		strcpy(outData.m_substanceTexturePath, GetMaterialPath(material, aiTextureType_SPECULAR, path).c_str());
-		strcpy(outData.m_roughnessAOEmissivePath, GetMaterialPath(material, aiTextureType_LIGHTMAP, path).c_str());
+		outData.m_diffusePath = GetMaterialPath(material, aiTextureType_DIFFUSE, path).c_str();
+		outData.m_normalTexturePath =  GetMaterialPath(material, aiTextureType_NORMALS, path).c_str();
+		outData.m_substanceTexturePath =  GetMaterialPath(material, aiTextureType_SPECULAR, path).c_str();
+		outData.m_roughnessAOEmissivePath =  GetMaterialPath(material, aiTextureType_LIGHTMAP, path).c_str();
 	}
 #endif
 }
@@ -141,7 +143,7 @@ void LoadIndecies(const aiMesh* mesh, UINT** indices, UINT& outNumIndicies)
 		}
 	}
 }
-
+/*
 void LoadAnimatedModel(const struct aiScene* scene, RevModel* newModel, const char* path)
 {
 	RevAnimatedNodelInitializationData initializationData;
@@ -377,7 +379,7 @@ void LoadNormalModel(const struct aiScene* scene, RevModelData& outModelData, co
 			}
 
 			LoadIndecies(mesh, outModelData.m_indices);
-		//	LoadTexturePaths(mesh, scene, initializationData.m_textureInitialization, path);
+			LoadTexturePaths(mesh, scene, outModelData.m_textures, path);
 		}
 	}
 
