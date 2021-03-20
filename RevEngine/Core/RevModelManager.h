@@ -13,16 +13,16 @@ public:
     RevModelManager() {};
 
     /** Finds a model (or tries loading it if desired). */
-    static RevModel* FindModel(RevModelRetrievalData desiredType, bool loadIfNotFound = true);
+    static RevModel* FindModel(RevModelInitializationData desiredType, bool loadIfNotFound = true);
     static RevModel* FindModelFromHandle(REV_ID_HANDLE handle);
-    static REV_ID_HANDLE FindModelHandleFromType(RevModelRetrievalData desiredType, bool loadIfNotFound = true);
+    static REV_ID_HANDLE FindModelHandleFromType(RevModelInitializationData desiredType, bool loadIfNotFound = true);
 
     /** Generates all SBT models. */
     static void GenerateAccelerationBuffersAllModels();
 
 private:
 
-    RevModel* CreateModelInternal(RevModelRetrievalData desiredType);
+    RevModel* CreateModelInternal(RevModelInitializationData inData);
 
     RevModel* FindModelTypeInternal(RevEModelType desiredType);
     RevModel* FindModelHandleInternal(REV_ID_HANDLE handle);

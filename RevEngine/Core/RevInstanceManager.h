@@ -18,7 +18,7 @@ class RevInstanceManager : public RevEngineManager
 public:
     RevInstanceManager() {};
 
-    static void AddInstance(RevModelRetrievalData data, DirectX::XMMATRIX transform);
+    static void AddInstance(RevModelInitializationData data, DirectX::XMMATRIX transform);
     static void AddAllInstancesToSBT(  nv_helpers_dx12::TopLevelASGenerator* generator);
     
     void DrawInstances();

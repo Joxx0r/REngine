@@ -68,7 +68,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies);dxcompiler.lib;assimp.lib</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies);dxcompiler.lib;assimp.lib;dxgi.lib</AdditionalDependencies>
       <DelayLoadDLLs>d3d12.dll</DelayLoadDLLs>
     </Link>
     <CustomBuildStep>
@@ -134,6 +134,7 @@
     <ClInclude Include="Core\RevShaderTypes.h" />
     <ClInclude Include="Core\RevUtils.h" />
     <ClInclude Include="D3D\RevD3DTypes.h" />
+    <ClInclude Include="Microsoft\RevDDSTextureLoader.h" />
     <ClInclude Include="RevEngineMain.h" />
     <ClInclude Include="DXRHelper.h" />
     <ClInclude Include="Misc\RevTypes.h" />
@@ -1261,6 +1262,7 @@
     <ClCompile Include="Core\RevShaderManager.cpp" />
     <ClCompile Include="Core\RevUtils.cpp" />
     <ClCompile Include="D3D\RevD3DTypes.cpp" />
+    <ClCompile Include="Microsoft\RevDDSTextureLoader.cpp" />
     <ClCompile Include="RevEngineMain.cpp" />
     <ClCompile Include="RaytracingPipelineGenerator.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>

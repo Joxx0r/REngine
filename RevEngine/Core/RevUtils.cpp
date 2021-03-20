@@ -16,7 +16,7 @@ struct ID3D12Resource* RevUtils::CreateDefaultBuffer(
 		UINT64 byteSize, 
 		ID3D12Resource* uploadBuffer)
 {
-/*	ID3D12Resource* defaultBuffer;
+	ID3D12Resource* defaultBuffer;
 	// Create the actual default buffer resource.
 	ThrowIfFailed(device->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
@@ -50,7 +50,7 @@ struct ID3D12Resource* RevUtils::CreateDefaultBuffer(
 		D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST));
 	UpdateSubresources<1>(cmdList, defaultBuffer, uploadBuffer, 0, 0, 1, &subResourceData);
 	cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(defaultBuffer,
-		D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ));*/
+		D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ));
 
 	// Note: uploadBuffer has to be kept alive after the above function calls because
 	// the command list has not been executed yet that performs the actual copy.

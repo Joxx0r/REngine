@@ -11,7 +11,7 @@ class RevInstance
 public:
     RevInstance() {};
 
-    void Initialize( RevModelRetrievalData data, DirectX::XMMATRIX transform);
+    void Initialize( RevModelInitializationData modelInitializationData, DirectX::XMMATRIX transform);
     void DrawInstance();
 
     DirectX::XMMATRIX m_transform;

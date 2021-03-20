@@ -12,14 +12,32 @@ struct AccelerationStructureBuffers
     ComPtr<ID3D12Resource> pInstanceDesc; // Hold the matrices of the instances
 };
 
+enum class RevTextureType : UINT8
+{
+    Invalid,
+    Diffuse,
+    Normal,
+    Substance,
+    RoughnessAOEmissive
+};
 
+struct RevTexture
+{
+    RevTexture() { m_type = RevTextureType::Invalid; }
+    RevTexture(const std::wstring& path, RevTextureType type)
+    {
+        m_path = path;
+        m_resource = nullptr;
+        m_type = type;
+    }
+    std::wstring m_path;
+    ID3D12Resource* m_resource = nullptr;
+    RevTextureType m_type;
+};
 
 struct RevTextureCollection
 {
-    std::wstring m_diffusePath;
-    std::wstring m_normalTexturePath;
-    std::wstring m_substanceTexturePath;
-    std::wstring m_roughnessAOEmissivePath;
+    std::vector<RevTexture> m_textures;
     int m_numTextures = 0;
 };
 

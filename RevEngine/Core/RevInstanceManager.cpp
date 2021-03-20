@@ -9,7 +9,7 @@ RevInstanceManager* GetInstanceManagerInternal()
     return RevEngineRetrievalFunctions::GetInstanceManager();
 }
 
-void RevInstanceManager::AddInstance(RevModelRetrievalData data,  DirectX::XMMATRIX transform)
+void RevInstanceManager::AddInstance(RevModelInitializationData data,  DirectX::XMMATRIX transform)
 {
     RevInstanceManager* instanceManager = GetInstanceManagerInternal();
     if(!instanceManager)

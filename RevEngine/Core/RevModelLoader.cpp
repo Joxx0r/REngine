@@ -20,6 +20,19 @@
 #include "RevEngineRetrievalFunctions.h"
 #include "Shlwapi.h"
 #include "../DXSampleHelper.h"
+#include "../Microsoft/RevDDSTextureLoader.h"
+
+void LoadTexture(const std::wstring& path, struct ID3D12Resource** resourceToEndUpAt)
+{
+	std::vector<D3D12_SUBRESOURCE_DATA> subResources;
+	std::unique_ptr<uint8_t[]> ddsData;
+	ThrowIfFailed(LoadDDSTextureFromFile(
+        RevEngineRetrievalFunctions::GetDevice(),
+        path.c_str(),
+        resourceToEndUpAt,
+        ddsData,
+        subResources));
+}
 
 std::wstring GetMaterialPath(aiMaterial* material, aiTextureType type, std::wstring basePath)
 {
@@ -30,9 +43,8 @@ std::wstring GetMaterialPath(aiMaterial* material, aiTextureType type, std::wstr
 	std::wstring element = converter.from_bytes(str.C_Str());
 	std::wstring data = element.substr(2, element.length() - 1);
 	std::wstring pathFile = basePath;
-	size_t elem = pathFile.find_last_of('\\');
-	std::wstring otherString = pathFile.substr(0, elem + 1);
-	otherString.append(data);
+	std::wstring otherString = pathFile.substr(0, pathFile.find_last_of('/') + 1);
+	otherString += data;
 	return otherString;
 #else
 	std::string returnString;
@@ -110,10 +122,10 @@ void LoadTexturePaths(
 	{
 		outData.m_numTextures = 4;
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		outData.m_diffusePath = GetMaterialPath(material, aiTextureType_DIFFUSE, path).c_str();
-		outData.m_normalTexturePath =  GetMaterialPath(material, aiTextureType_NORMALS, path).c_str();
-		outData.m_substanceTexturePath =  GetMaterialPath(material, aiTextureType_SPECULAR, path).c_str();
-		outData.m_roughnessAOEmissivePath =  GetMaterialPath(material, aiTextureType_LIGHTMAP, path).c_str();
+		outData.m_textures.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::Diffuse));
+		outData.m_textures.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::Normal));
+		outData.m_textures.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::Substance));
+		outData.m_textures.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::RoughnessAOEmissive));
 	}
 #endif
 }
@@ -380,6 +392,10 @@ void LoadNormalModel(const struct aiScene* scene, RevModelData& outModelData, co
 
 			LoadIndecies(mesh, outModelData.m_indices);
 			LoadTexturePaths(mesh, scene, outModelData.m_textures, path);
+			for (auto& texturePath : outModelData.m_textures.m_textures)
+			{
+				LoadTexture(texturePath.m_path, &texturePath.m_resource);
+			}
 		}
 	}
 
@@ -401,6 +417,8 @@ void LoadNormalModel(const struct aiScene* scene, RevModelData& outModelData, co
 	}*/
 #endif
 }
+
+
 
 RevModel* RevModelLoader::LoadModel(const std::wstring& path)
 {
@@ -483,6 +501,8 @@ RevModel* RevModelLoader::LoadModel(const std::wstring& path)
 	return newModel;
 }
 
+
+
 RevModelData RevModelLoader::CreateModelDataFromFile(const std::wstring& path)
 {
 	RevModelData modelData = {};
@@ -545,9 +565,13 @@ RevModelData RevModelLoader::CreateModelDataFromFile(const std::wstring& path)
 		{
 			//	LoadAnimatedModel(scene, newModel, path);
 		}
+
+
+		
 #else
 		assert(0 && "Not using assimp and dont have proepr context");
 #endif
 	}
 	return modelData;
 }
+

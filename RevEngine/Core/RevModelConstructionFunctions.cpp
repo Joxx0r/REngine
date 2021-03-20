@@ -4,21 +4,21 @@
 #include "RevModelLoader.h"
 #include "../D3D/RevD3DTypes.h"
 
-RevModelData RevModelConstructionFunctions::CreateModelDataType(RevModelRetrievalData data)
+RevModelData RevModelConstructionFunctions::CreateModelDataType(RevModelInitializationData inData)
 {
-    if(data.m_type == RevEModelType::Triangle)
+    if(inData.m_type == RevEModelType::Triangle)
     {
         return RevModelConstructionFunctions::CreateTriangleData();
     }
     else
-    if(data.m_type == RevEModelType::Plane)
+    if(inData.m_type == RevEModelType::Plane)
     {
         return RevModelConstructionFunctions::CreatePlaneData();
     }
     else
-    if(data.m_type == RevEModelType::ModelStatic)
+    if(inData.m_type == RevEModelType::ModelStatic)
     {
-        return RevModelLoader::CreateModelDataFromFile(data.m_path.c_str());
+        return RevModelLoader::CreateModelDataFromFile(inData.m_path.c_str());
     }
     return RevModelData();
 }

@@ -26,19 +26,19 @@ enum RevEModelType : UINT8
     ModelAnimated
 };
 
-struct RevModelRetrievalData
+struct RevModelInitializationData
 {
-    RevModelRetrievalData()
+    RevModelInitializationData()
     {
         m_type = RevEModelType::Invalid;
     }
 
-    RevModelRetrievalData(std::wstring path)
+    RevModelInitializationData(std::wstring path)
     {
         m_type = ModelStatic;
         m_path = path;
     }
-    RevModelRetrievalData(RevEModelType type)
+    RevModelInitializationData(RevEModelType type)
     {
         m_type = type;
         m_path = L"";
