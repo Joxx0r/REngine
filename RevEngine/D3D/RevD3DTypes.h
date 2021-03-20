@@ -35,18 +35,12 @@ struct RevTexture
     RevTextureType m_type;
 };
 
-struct RevTextureCollection
-{
-    std::vector<RevTexture> m_textures;
-    int m_numTextures = 0;
-};
-
 struct RevModelData
 {
     std::vector<RevVertexPosCol> m_vertexes;
     std::vector<RevVertexPosTexNormBiTan> m_staticVertexes;
     std::vector<UINT> m_indices;
-    RevTextureCollection m_textures;
+    std::vector<RevTexture> m_textures;
     RevEModelType m_type = RevEModelType::Invalid;
     
     int GetModelIndexSize() const { return m_indices.size() * sizeof(UINT); }
@@ -110,6 +104,9 @@ struct RevModelD3DData
     ComPtr<ID3D12Resource> m_indexBuffer;
     D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
     ComPtr<ID3D12RootSignature> m_rootSignature;
+    std::vector<RevTexture> m_textures;
+    ComPtr<ID3D12DescriptorHeap> m_descriptorHeap;
+    
     
     int m_vertexCount = REV_INDEX_NONE;
     int m_indexCount = REV_INDEX_NONE;

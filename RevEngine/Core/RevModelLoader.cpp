@@ -22,17 +22,6 @@
 #include "../DXSampleHelper.h"
 #include "../Microsoft/RevDDSTextureLoader.h"
 
-void LoadTexture(const std::wstring& path, struct ID3D12Resource** resourceToEndUpAt)
-{
-	std::vector<D3D12_SUBRESOURCE_DATA> subResources;
-	std::unique_ptr<uint8_t[]> ddsData;
-	ThrowIfFailed(LoadDDSTextureFromFile(
-        RevEngineRetrievalFunctions::GetDevice(),
-        path.c_str(),
-        resourceToEndUpAt,
-        ddsData,
-        subResources));
-}
 
 std::wstring GetMaterialPath(aiMaterial* material, aiTextureType type, std::wstring basePath)
 {
@@ -112,20 +101,18 @@ aiNode* FindNodeRecursive(aiNode* node, const char* name)
 void LoadTexturePaths(
 		const aiMesh* mesh, 
 		const struct aiScene* scene, 
-		RevTextureCollection& outData,
+		std::vector<RevTexture>& outData,
 		const std::wstring& path)
 {
 #if USE_ASSIMP
-	outData.m_numTextures = 0;
 	UINT numMaterial = mesh->mMaterialIndex;
 	if (mesh->mMaterialIndex >= 0)
 	{
-		outData.m_numTextures = 4;
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		outData.m_textures.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::Diffuse));
-		outData.m_textures.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::Normal));
-		outData.m_textures.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::Substance));
-		outData.m_textures.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::RoughnessAOEmissive));
+		outData.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::Diffuse));
+		outData.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::Normal));
+		outData.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::Substance));
+		outData.push_back(RevTexture(GetMaterialPath(material, aiTextureType_DIFFUSE, path), RevTextureType::RoughnessAOEmissive));
 	}
 #endif
 }
@@ -373,7 +360,7 @@ void LoadAnimatedModel(const struct aiScene* scene, RevModel* newModel, const ch
 
 }
 */
-void LoadNormalModel(const struct aiScene* scene, RevModelData& outModelData, const std::wstring& path)
+void LoadNormalModel( const struct aiScene* scene, RevModelData& outModelData, const std::wstring& path)
 {
 #if USE_ASSIMP
 	bool foundFile = false;
@@ -392,10 +379,6 @@ void LoadNormalModel(const struct aiScene* scene, RevModelData& outModelData, co
 
 			LoadIndecies(mesh, outModelData.m_indices);
 			LoadTexturePaths(mesh, scene, outModelData.m_textures, path);
-			for (auto& texturePath : outModelData.m_textures.m_textures)
-			{
-				LoadTexture(texturePath.m_path, &texturePath.m_resource);
-			}
 		}
 	}
 

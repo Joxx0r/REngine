@@ -5,6 +5,19 @@
 #include "../DXRHelper.h"
 #include "../DXSampleHelper.h"
 #include "../Core/RevEngineRetrievalFunctions.h"
+#include "../Microsoft/RevDDSTextureLoader.h"
+
+void LoadTexture(const std::wstring& path, struct ID3D12Resource** resourceToEndUpAt)
+{
+	std::vector<D3D12_SUBRESOURCE_DATA> subResources;
+	std::unique_ptr<uint8_t[]> ddsData;
+	ThrowIfFailed(LoadDDSTextureFromFile(
+        RevEngineRetrievalFunctions::GetDevice(),
+        path.c_str(),
+        resourceToEndUpAt,
+        ddsData,
+        subResources));
+}
 
 RevModelD3DData RevModelD3DData::Create(const RevModelData& data)
 {
@@ -68,6 +81,41 @@ RevModelD3DData RevModelD3DData::Create(const RevModelData& data)
         returnData.m_indexBufferView.Format = DXGI_FORMAT_R32_UINT;
         returnData.m_indexBufferView.SizeInBytes = indexBufferSize;
     }
+
+	if(data.m_textures.size() > 0)
+	{
+		returnData.m_textures = data.m_textures;
+
+		std::vector<ID3D12Resource*> resoures;
+		for (auto& texture : returnData.m_textures)
+		{
+			LoadTexture(texture.m_path, &texture.m_resource);
+			resoures.push_back(texture.m_resource);
+		}
+
+		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+		srvHeapDesc.NumDescriptors = resoures.size();
+		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		ThrowIfFailed(device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&returnData.m_descriptorHeap)));
+	
+		CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(returnData.m_descriptorHeap->GetCPUDescriptorHandleForHeapStart());
+		for (UINT i = 0; i < resoures.size(); i++)
+		{
+			ID3D12Resource* resource = resoures[i];
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			srvDesc.Format = resource->GetDesc().Format;
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			srvDesc.Texture2D.MostDetailedMip = 0;
+			srvDesc.Texture2D.MipLevels = resource->GetDesc().MipLevels;
+			srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+			device->CreateShaderResourceView(resource, &srvDesc, hDescriptor);
+			hDescriptor.Offset(1, device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+		}
+		
+	}
+	
     return returnData;
 }
 AccelerationStructureBuffers RevModelD3DData::CreateAccelerationStructure(const RevModelD3DData& inData)
