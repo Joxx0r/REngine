@@ -36,7 +36,12 @@ RevModelData RevModelConstructionFunctions::CreateTriangleData()
     {
         returnData.m_indices = {0, 1, 2, 0, 3, 1, 0, 2, 3, 1, 3, 2};
     }
-
+    returnData.m_inputLayout =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+};
+    returnData.m_shaderPath = L"Data//Shaders//Shaders.hlsl";
     return returnData;
 }
 
@@ -52,5 +57,11 @@ RevModelData RevModelConstructionFunctions::CreatePlaneData()
         {{-1.5f, -.8f, -1.5f}, {1.0f, 1.0f, 1.0f, 1.0f}}, // 1
         {{1.5f, -.8f, -1.5f}, {1.0f, 1.0f, 1.0f, 1.0f}}  // 4
     };
+    returnData.m_shaderPath = L"Data//Shaders//Shaders.hlsl";
+    returnData.m_inputLayout =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+};
     return returnData;
 }

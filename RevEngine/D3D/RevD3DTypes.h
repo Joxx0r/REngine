@@ -41,6 +41,8 @@ struct RevModelData
     std::vector<RevVertexPosTexNormBiTan> m_staticVertexes;
     std::vector<UINT> m_indices;
     std::vector<RevTexture> m_textures;
+    std::wstring m_shaderPath;
+    std::vector<D3D12_INPUT_ELEMENT_DESC> m_inputLayout;
     RevEModelType m_type = RevEModelType::Invalid;
     
     int GetModelIndexSize() const { return m_indices.size() * sizeof(UINT); }
@@ -106,6 +108,7 @@ struct RevModelD3DData
     ComPtr<ID3D12RootSignature> m_rootSignature;
     std::vector<RevTexture> m_textures;
     ComPtr<ID3D12DescriptorHeap> m_descriptorHeap;
+    ID3D12PipelineState* m_pso;
     
     
     int m_vertexCount = REV_INDEX_NONE;

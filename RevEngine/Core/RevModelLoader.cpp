@@ -403,89 +403,6 @@ void LoadNormalModel( const struct aiScene* scene, RevModelData& outModelData, c
 
 
 
-RevModel* RevModelLoader::LoadModel(const std::wstring& path)
-{
-	ID3D12GraphicsCommandList* commandList = RevEngineRetrievalFunctions::GetCommandList();
-	ThrowIfFailed(commandList->Reset(RevEngineRetrievalFunctions::GetCommandAllocator(), nullptr));
-
-	RevModel* newModel = new RevModel();
-	RevModelData modelData = {};
-
-	RevEModelType type = RevEModelType::ModelStatic;
-
-	bool loadedBinary = false;
-	std::wstring modelPath(path);
-	modelPath = modelPath.substr(0, modelPath.find_last_of('.'));
-	modelPath.append(L"_MODEL.rrev");
-
-#if DO_LOAING_BINARY
-	if (PathFileExists(modelPath.c_str()))
-	{
-		std::fstream fstream;
-		fstream.open(modelPath.c_str(), std::ios_base::in | std::ios_base::binary);
-		if (fstream.is_open())
-		{
-			UINT size = 0;
-			fstream >> size;
-
-			RevArchiveLoader loader(size);
-			fstream.read((char*)loader.m_byteArray, size);
-			loader << type;
-			if (type == RevModelType::Animated)
-			{
-				RevAnimatedNodelInitializationData initData = {};
-				initData.Serialize(loader);
-				RevEngineFunctions::CreateAnimatedModelGeometry(
-					initData,
-					newModel->m_modelData);
-			}
-			else
-			{
-				RevNormalModelInitializationData initData = {};
-				initData.Serialize(loader);
-				RevEngineFunctions::CreateNormalModelGeometry(
-					initData,
-					newModel->m_modelData);
-			}
-
-			fstream.close();
-			loader.Delete();
-		}
-	}
-	else
-#endif
-	{
-#if USE_ASSIMP
-		char output[256];
-		const WCHAR* wc =path.c_str();
-		sprintf_s(&output[0], 256, "%ws", wc);
-		const struct aiScene* scene = aiImportFile(output, 0);
-		assert(scene);
-		modelData.m_type = scene->HasAnimations() ? RevEModelType::ModelAnimated : RevEModelType::ModelStatic;
-		if (modelData.m_type == RevEModelType::ModelStatic)
-		{
-			LoadNormalModel(scene, modelData, path);
-		}
-		else
-		{
-		//	LoadAnimatedModel(scene, newModel, path);
-		}
-#else
-		assert(0 && "Not using assimp and dont have proepr context");
-#endif
-	}
-
-	newModel->Initialize(modelData,  4);
-	ThrowIfFailed(commandList->Close());
-	ID3D12CommandList* cmdsLists[] = { commandList  };
-	RevEngineRetrievalFunctions::GetCommandQueue()->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-	// Wait until initialization is complete.
-	RevEngineExecutionFunctions::FlushCommandQueue();
-	return newModel;
-}
-
-
-
 RevModelData RevModelLoader::CreateModelDataFromFile(const std::wstring& path)
 {
 	RevModelData modelData = {};
@@ -549,7 +466,15 @@ RevModelData RevModelLoader::CreateModelDataFromFile(const std::wstring& path)
 			//	LoadAnimatedModel(scene, newModel, path);
 		}
 
-
+		modelData.m_shaderPath = L"Data//Shaders//StaticModel.hlsl";
+		modelData.m_inputLayout =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+		};
 		
 #else
 		assert(0 && "Not using assimp and dont have proepr context");

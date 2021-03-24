@@ -5,6 +5,8 @@
 #include "../DXRHelper.h"
 #include "../DXSampleHelper.h"
 #include "../Core/RevEngineRetrievalFunctions.h"
+#include "../Core/RevShaderManager.h"
+#include "../Core/RevUtils.h"
 #include "../Microsoft/RevDDSTextureLoader.h"
 
 void LoadTexture(const std::wstring& path, struct ID3D12Resource** resourceToEndUpAt)
@@ -82,6 +84,26 @@ RevModelD3DData RevModelD3DData::Create(const RevModelData& data)
         returnData.m_indexBufferView.SizeInBytes = indexBufferSize;
     }
 
+	//will be implemented later
+	RevUtils::CreateModelRootDescription(returnData);
+
+    {
+    	RevPSOInitializationData initializationData = {};
+    	initializationData.m_shader = RevEngineRetrievalFunctions::GetShaderManager()->GetShaderRasterizer(data.m_shaderPath);
+    	initializationData.m_inputLayoutData = data.m_inputLayout.data();
+    	initializationData.m_nInputLayout = data.m_inputLayout.size();
+    	initializationData.m_rootSignature = returnData.m_rootSignature.Get();
+    	initializationData.m_pso= &returnData.m_pso;
+    	initializationData.m_numRenderTargets = 4;
+    	DXGI_FORMAT formats[] = { 
+    		DXGI_FORMAT_R8G8B8A8_UNORM, 
+            DXGI_FORMAT_R16G16B16A16_FLOAT , 
+            DXGI_FORMAT_R8G8B8A8_UNORM , 
+            DXGI_FORMAT_R8G8B8A8_UNORM };
+    	initializationData.m_rtvFormats = &formats[0];
+    	RevUtils::CreatePSO(initializationData);	    
+    }
+
 	if(data.m_textures.size() > 0)
 	{
 		returnData.m_textures = data.m_textures;
@@ -113,8 +135,8 @@ RevModelD3DData RevModelD3DData::Create(const RevModelData& data)
 			device->CreateShaderResourceView(resource, &srvDesc, hDescriptor);
 			hDescriptor.Offset(1, device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 		}
-		
 	}
+
 	
     return returnData;
 }

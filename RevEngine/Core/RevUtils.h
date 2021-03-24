@@ -1,11 +1,12 @@
 #pragma once
 
+struct RevModelD3DData;
 struct RevPSOInitializationData
 {
 	UINT m_nInputLayout = 0;
 	UINT m_numRenderTargets = 1;
 	struct RevShaderRasterizer* m_shader = nullptr;
-	D3D12_INPUT_ELEMENT_DESC* m_inputLayoutData = nullptr;
+	const D3D12_INPUT_ELEMENT_DESC* m_inputLayoutData = nullptr;
 	struct ID3D12RootSignature* m_rootSignature = nullptr;
 	struct ID3D12PipelineState** m_pso = nullptr;
 	D3D12_BLEND_DESC* m_blendDesc = nullptr;
@@ -44,10 +45,7 @@ public:
 		UINT64 byteSize,
 		ID3D12Resource* uploadBuffer);
 
-	static void CreateModelRootDescription(
-		CD3DX12_ROOT_PARAMETER* parameter,
-		UINT nParameters,
-		struct RevModelD3DData* outData);
+	static void CreateModelRootDescription(RevModelD3DData& outData);
 
 	static void CreatePSO(
 		RevPSOInitializationData& initializationData);

@@ -12,6 +12,7 @@
 struct PSInput
 {
     float4 position : SV_POSITION;
+    float2 tex : TEXCOORD;
 };
 
 // #DXR Extra: Perspective Camera
@@ -29,6 +30,7 @@ PSInput VSMain(float3 position : POSITION, float2 tex : TEXCOORD, float3 normal 
     pos = mul(view, pos);
     pos = mul(projection, pos);
     result.position = pos;
+    result.tex = tex;
     return result;
 }
 

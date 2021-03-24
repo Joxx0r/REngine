@@ -117,40 +117,36 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> RevGetStaticSamplers()
 
 }
 
-void RevUtils::CreateModelRootDescription(
-		CD3DX12_ROOT_PARAMETER* parameter, 
-		UINT nParameters,
-		 RevModelD3DData* outData)
+void RevUtils::CreateModelRootDescription(RevModelD3DData& outData)
 {
 	auto staticSamplers = RevGetStaticSamplers();
+	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+	rootSignatureDesc.Init(
+        0, nullptr, 0, nullptr,
+        D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-	// A root signature is an array of root parameters.
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
-		nParameters,
-		parameter,
-		(UINT)staticSamplers.size(), staticSamplers.data(),
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	// #DXR Extra: Perspective Camera
+	// The root signature describes which data is accessed by the shader. The camera matrices are held
+	// in a constant buffer, itself referenced the heap. To do this we reference a range in the heap,
+	// and use that range as the sole parameter of the shader. The camera buffer is associated in the
+	// index 0, making it accessible in the shader in the b0 register.
+	CD3DX12_ROOT_PARAMETER constantParameter;
+	CD3DX12_DESCRIPTOR_RANGE range;
+	range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+	constantParameter.InitAsDescriptorTable(1, &range, D3D12_SHADER_VISIBILITY_ALL);
 
-	// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
-	ID3DBlob* serializedRootSig = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-	HRESULT hr = D3D12SerializeRootSignature(
-		&rootSigDesc,
-		D3D_ROOT_SIGNATURE_VERSION_1,
-		&serializedRootSig,
-		&errorBlob);
-
-	if (errorBlob != nullptr)
-	{
-		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	}
-	ThrowIfFailed(hr);
-	
+	rootSignatureDesc.Init(1, &constantParameter, 0, nullptr,
+                           D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+		
+	ComPtr<ID3DBlob> signature;
+	ComPtr<ID3DBlob> error;
+	ThrowIfFailed(D3D12SerializeRootSignature(
+        &rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
 	ThrowIfFailed(RevEngineRetrievalFunctions::GetDevice()->CreateRootSignature(
-		0,
-		serializedRootSig->GetBufferPointer(),
-		serializedRootSig->GetBufferSize(),
-		IID_PPV_ARGS(&outData->m_rootSignature)));
+        0, signature->GetBufferPointer(), signature->GetBufferSize(),
+        IID_PPV_ARGS(&outData.m_rootSignature)));
+	
+
 }
 
 void RevUtils::CreatePSO(
