@@ -270,6 +270,7 @@ void RevEngineMain::LoadAssets()
 		// complete before continuing.
 		WaitForPreviousFrame();
 	}
+	m_shaderManager->Initialize();
 }
 
 
@@ -663,7 +664,6 @@ ComPtr<id3d12rootsignature> RevEngineMain::CreateMissSignature() const
 //
 void RevEngineMain::CreateRaytracingPipeline()
 {
-	m_shaderManager->Initialize();
 	nv_helpers_dx12::RayTracingPipelineGenerator pipeline(m_device.Get());
 
 	pipeline.AddLibrary(RevShaderManager::GetShaderLibrary(L"Data//Shaders//RayGen.hlsl")->m_blob, {L"RayGen"});
