@@ -28,18 +28,11 @@ void RevModel::DrawRasterized() const
 		list->IASetIndexBuffer(&m_d3dData.m_indexBufferView);
 	}
 
+	ID3D12GraphicsCommandList* commandList = RevEngineRetrievalFunctions::GetCommandList();
+	commandList->SetPipelineState(m_d3dData.m_pso);
+	
 	if(drawIndexed)
 	{
-		/*if(m_d3dData.m_descriptorHeap.Get())
-		{
-			const int size = RevEngineRetrievalFunctions::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			ID3D12DescriptorHeap* descriptorHeaps[] = { m_d3dData.m_descriptorHeap.Get() };
-			list->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-			CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_d3dData.m_descriptorHeap->GetGPUDescriptorHandleForHeapStart());
-			tex.Offset(0, size);
-			list->SetGraphicsRootDescriptorTable(0, tex);
-		}
-*/
 		list->DrawIndexedInstanced(m_d3dData.m_indexCount, 1, 0, 0, 0);
 	}
 	else
