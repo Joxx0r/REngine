@@ -56,3 +56,8 @@ struct RevEngineInitializationData
     RevWindowData m_windowData;
     bool m_rasterDefault;
 };
+
+struct RevDrawData
+{
+     ComPtr<ID3D12Resource> m_cameraCB;
+};

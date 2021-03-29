@@ -85,8 +85,9 @@ RevModelD3DData RevModelD3DData::Create(const RevModelData& data)
     }
 
 	//will be implemented later
-	RevUtils::CreateModelRootDescription(returnData);
-
+	CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+    slotRootParameter[0].InitAsConstantBufferView(0);
+    RevUtils::CreateModelRootDescription(&slotRootParameter[0], ARRAYSIZE(slotRootParameter), returnData);
     {
     	RevPSOInitializationData initializationData = {};
     	initializationData.m_shader = RevEngineRetrievalFunctions::GetShaderManager()->GetShaderRasterizer(data.m_shaderPath);

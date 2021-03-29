@@ -39,11 +39,11 @@ void RevInstanceManager::AddAllInstancesToSBT(nv_helpers_dx12::TopLevelASGenerat
     }
 }
 
-void RevInstanceManager::DrawInstances()
+void RevInstanceManager::DrawInstances(const RevDrawData& data)
 {
     for(RevInstance* instance : m_instances)
     {
         assert(instance);
-        instance->DrawInstance();
+        instance->DrawInstance(data);
     }
 }        

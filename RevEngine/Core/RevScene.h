@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "RevInstanceManager.h"
 
+struct RevDrawData;
+class RevCamera;
 class RevEngineMain;
 class RevInstanceManager;
 
@@ -10,7 +12,7 @@ public:
 
     void Initialize();
 
-    void DrawScene();
+    void DrawScene(const RevDrawData& data);
     
     RevInstanceManager* m_instanceManager;
 };

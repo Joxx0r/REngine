@@ -117,27 +117,18 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> RevGetStaticSamplers()
 
 }
 
-void RevUtils::CreateModelRootDescription(RevModelD3DData& outData)
+void RevUtils::CreateModelRootDescription(
+	CD3DX12_ROOT_PARAMETER* parameter,
+        UINT nParameters,
+        RevModelD3DData& outData)
 {
 	auto staticSamplers = RevGetStaticSamplers();
-	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.Init(
-        0, nullptr, 0, nullptr,
-        D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc(
+    nParameters,
+    parameter,
+    (UINT)staticSamplers.size(), staticSamplers.data(),
+    D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-	// #DXR Extra: Perspective Camera
-	// The root signature describes which data is accessed by the shader. The camera matrices are held
-	// in a constant buffer, itself referenced the heap. To do this we reference a range in the heap,
-	// and use that range as the sole parameter of the shader. The camera buffer is associated in the
-	// index 0, making it accessible in the shader in the b0 register.
-	CD3DX12_ROOT_PARAMETER constantParameter;
-	CD3DX12_DESCRIPTOR_RANGE range;
-	range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-	constantParameter.InitAsDescriptorTable(1, &range, D3D12_SHADER_VISIBILITY_ALL);
-
-	rootSignatureDesc.Init(1, &constantParameter, 0, nullptr,
-                           D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-		
 	ComPtr<ID3DBlob> signature;
 	ComPtr<ID3DBlob> error;
 	ThrowIfFailed(D3D12SerializeRootSignature(
@@ -145,7 +136,6 @@ void RevUtils::CreateModelRootDescription(RevModelD3DData& outData)
 	ThrowIfFailed(RevEngineRetrievalFunctions::GetDevice()->CreateRootSignature(
         0, signature->GetBufferPointer(), signature->GetBufferSize(),
         IID_PPV_ARGS(&outData.m_rootSignature)));
-	
 
 }
 

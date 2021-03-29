@@ -6,6 +6,7 @@
 #include "RevModelTypes.h"
 #include "../BottomLevelASGenerator.h"
 #include "../d3dx12.h"
+#include "../Misc/RevTypes.h"
 
 void RevModel::Initialize(const RevModelData& modelData, REV_ID_HANDLE handle)
 {
@@ -14,7 +15,7 @@ void RevModel::Initialize(const RevModelData& modelData, REV_ID_HANDLE handle)
 	m_d3dData = RevModelD3DData::Create(m_modelData);
 }
 
-void RevModel::DrawRasterized() const
+void RevModel::DrawRasterized(const RevDrawData& data) const
 {
 	ID3D12GraphicsCommandList4* list = RevEngineRetrievalFunctions::GetCommandList();
 	bool drawIndexed = false;
@@ -30,7 +31,10 @@ void RevModel::DrawRasterized() const
 
 	ID3D12GraphicsCommandList* commandList = RevEngineRetrievalFunctions::GetCommandList();
 	commandList->SetPipelineState(m_d3dData.m_pso);
-
+	commandList->SetGraphicsRootSignature(m_d3dData.m_rootSignature.Get());
+	commandList->SetGraphicsRootConstantBufferView(
+    0, data.m_cameraCB.Get()->GetGPUVirtualAddress());
+	
 	if(m_d3dData.m_descriptorHeap.Get())
 	{
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_d3dData.m_descriptorHeap.Get() };

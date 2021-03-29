@@ -45,7 +45,10 @@ public:
 		UINT64 byteSize,
 		ID3D12Resource* uploadBuffer);
 
-	static void CreateModelRootDescription(RevModelD3DData& outData);
+	static void CreateModelRootDescription(
+		CD3DX12_ROOT_PARAMETER* parameter,
+        UINT nParameters,
+        RevModelD3DData& outData);
 
 	static void CreatePSO(
 		RevPSOInitializationData& initializationData);

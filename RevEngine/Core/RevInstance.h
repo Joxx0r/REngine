@@ -5,6 +5,7 @@
 #include "RevCoreDefines.h"
 #include "RevModelManager.h"
 
+struct RevDrawData;
 enum RevEModelType : UINT8;
 class RevInstance
 {
@@ -12,7 +13,7 @@ public:
     RevInstance() {};
 
     void Initialize( RevModelInitializationData modelInitializationData, DirectX::XMMATRIX transform);
-    void DrawInstance();
+    void DrawInstance(const RevDrawData& data);
 
     DirectX::XMMATRIX m_transform;
 

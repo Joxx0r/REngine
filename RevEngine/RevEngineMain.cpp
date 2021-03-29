@@ -355,7 +355,9 @@ void RevEngineMain::PopulateCommandList() const
 		const float clearColor[] = {0.0f, 0.2f, 0.4f, 1.0f};
 		m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-		m_scene->DrawScene();
+		RevDrawData drawData = {};
+		drawData.m_cameraCB = m_cameraBuffer.Get();
+		m_scene->DrawScene(drawData);
 	}
 	else
 	{
@@ -940,11 +942,11 @@ void RevEngineMain::CreateDepthBuffer()
 	D3D12_HEAP_PROPERTIES depthHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
 	D3D12_RESOURCE_DESC depthResourceDesc =
-      CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_windowData.m_width, m_windowData.m_height, 1, 1);
+      CD3DX12_RESOURCE_DESC::Tex2D(REV_DEPTH_STENCIL_FORMAT, m_windowData.m_width, m_windowData.m_height, 1, 1);
 	depthResourceDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 	// The depth values will be initialized to 1
-	CD3DX12_CLEAR_VALUE depthOptimizedClearValue(DXGI_FORMAT_D32_FLOAT, 1.0f, 0);
+	CD3DX12_CLEAR_VALUE depthOptimizedClearValue(REV_DEPTH_STENCIL_FORMAT, 1.0f, 0);
 
 	// Allocate the buffer itself, with a state allowing depth writes
 	ThrowIfFailed(m_device->CreateCommittedResource(
@@ -953,7 +955,7 @@ void RevEngineMain::CreateDepthBuffer()
 
 	// Write the depth buffer view into the depth buffer heap
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.Format = REV_DEPTH_STENCIL_FORMAT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 

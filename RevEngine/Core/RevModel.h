@@ -4,6 +4,7 @@
 #include "../TopLevelASGenerator.h"
 #include "../D3D/RevD3DTypes.h"
 
+struct RevDrawData;
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
@@ -15,7 +16,7 @@ public:
 
     void Initialize(const RevModelData& modelData, REV_ID_HANDLE handle);
 
-    void DrawRasterized() const;
+    void DrawRasterized(const RevDrawData& data) const;
     
     AccelerationStructureBuffers CreateStructureBuffer(); 
     

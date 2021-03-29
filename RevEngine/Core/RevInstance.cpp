@@ -10,7 +10,7 @@ void RevInstance::Initialize(RevModelInitializationData modelInitializationData,
    m_transform = transform;
 }
 
-void RevInstance::DrawInstance()
+void RevInstance::DrawInstance(const RevDrawData& data)
 {
-   RevModelManager::FindModelFromHandle(m_modelHandle)->DrawRasterized();
+   RevModelManager::FindModelFromHandle(m_modelHandle)->DrawRasterized(data);
 }

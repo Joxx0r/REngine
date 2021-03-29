@@ -5,6 +5,8 @@
 #include "RevEngineManager.h"
 #include "RevInstance.h"
 
+struct RevDrawData;
+class RevCamera;
 enum RevEModelType : UINT8;
 
 namespace nv_helpers_dx12 {
@@ -21,7 +23,7 @@ public:
     static void AddInstance(RevModelInitializationData data, DirectX::XMMATRIX transform);
     static void AddAllInstancesToSBT(  nv_helpers_dx12::TopLevelASGenerator* generator);
     
-    void DrawInstances();
+    void DrawInstances(const RevDrawData& data);
 
 private:
     
