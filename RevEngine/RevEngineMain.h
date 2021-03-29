@@ -41,10 +41,10 @@ class RevEngineMain
 {
 public:
     virtual ~RevEngineMain() = default;
-    RevEngineMain(const RevWindowData& data);
+    RevEngineMain(const RevEngineInitializationData& data);
 
     /** Static instance retrivals */
-    static RevEngineMain* Construct(const RevWindowData& data);
+    static RevEngineMain* Construct(const RevEngineInitializationData& data);
     static void Destroy();
     static RevEngineMain* Get();
 
@@ -121,7 +121,7 @@ public:
     ComPtr<ID3D12PipelineState> m_pipelineState;
     ComPtr<ID3D12GraphicsCommandList4> m_commandList;
     UINT m_rtvDescriptorSize;
-    bool m_raster = false;
+    bool m_isRasterizationActive = true;
 
     ComPtr<id3d12rootsignature> m_rayGenSignature;
     ComPtr<id3d12rootsignature> m_hitSignature;
@@ -153,6 +153,7 @@ public:
     ComPtr< ID3D12Resource > m_depthStencil;
 
     RevWindowData m_windowData;
+    RevEngineInitializationData m_initData;
 
     // Root assets path.
     std::wstring m_assetsPath;

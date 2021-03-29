@@ -21,24 +21,38 @@ struct RevInputState
     bool m_back;
 };
 
+
 struct RevWindowData
 {
-    static RevWindowData Construct(UINT width, UINT height, std::wstring title)
-    {
-        assert(width > 0 && height > 0);
-        RevWindowData returnData = {};
-        returnData.m_width = width;
-        returnData.m_height = height;
-        returnData.m_title = title;
-        return returnData;
-    }
+public:
+    RevWindowData(){ }
+    RevWindowData(UINT width, UINT height, std::wstring title):m_width(width), m_height(height), m_title(title){ }
+    UINT m_width;
+    UINT m_height;
+    std::wstring m_title;
 
     float GetAspectRatio() const
     {
         return static_cast<float>(m_width) / static_cast<float>(m_height);
     }
     
-    UINT m_width;
-    UINT m_height;
-    std::wstring m_title;
+};
+struct RevEngineInitializationData
+{
+    static RevEngineInitializationData Construct(UINT width, UINT height, std::wstring title, bool rasterDefault)
+    {
+        assert(width > 0 && height > 0);
+        RevEngineInitializationData returnData = {};
+        returnData.m_windowData = RevWindowData(width, height, title);
+        returnData.m_rasterDefault = rasterDefault;
+        return returnData;
+    }
+
+    float GetAspectRatio() const
+    {
+        return m_windowData.GetAspectRatio();
+    }
+    
+    RevWindowData m_windowData;
+    bool m_rasterDefault;
 };

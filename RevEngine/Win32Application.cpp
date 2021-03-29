@@ -17,8 +17,8 @@ HWND Win32Application::m_hwnd = nullptr;
 
 int Win32Application::Run(HINSTANCE hInstance, int nCmdShow)
 {
-    const RevWindowData windowData = RevWindowData::Construct(1024, 720, L"RevEngine");
-    RevEngineMain* main = RevEngineMain::Construct(windowData);
+    const RevEngineInitializationData initializationData = RevEngineInitializationData::Construct(1024, 720, L"RevEngine", true);
+    RevEngineMain* main = RevEngineMain::Construct(initializationData);
     // Initialize the window class.
     WNDCLASSEX windowClass = { 0 };
     windowClass.cbSize = sizeof(WNDCLASSEX);

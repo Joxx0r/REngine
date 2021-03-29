@@ -25,9 +25,11 @@
 
 RevEngineMain* RevEngineMain::s_instance = nullptr;
 
-RevEngineMain::RevEngineMain(const RevWindowData& data)
-	:m_windowData(data), m_viewport(0.0f, 0.0f, static_cast<float>(data.m_width), static_cast<float>(data.m_height)),  m_scissorRect(0, 0, static_cast<LONG>(data.m_width), static_cast<LONG>(data.m_height)), m_rtvDescriptorSize(0)
+RevEngineMain::RevEngineMain(const RevEngineInitializationData& data)
+	:m_windowData(data.m_windowData), m_viewport(0.0f, 0.0f, static_cast<float>(data.m_windowData.m_width), static_cast<float>(data.m_windowData.m_height)),  m_scissorRect(0, 0, static_cast<LONG>(data.m_windowData.m_width), static_cast<LONG>(data.m_windowData.m_height)), m_rtvDescriptorSize(0)
 {
+	m_initData = data;
+	m_isRasterizationActive = data.m_rasterDefault;
 	WCHAR assetsPath[512];
 	GetAssetsPath(assetsPath, _countof(assetsPath));
 	m_assetsPath = assetsPath;
@@ -35,7 +37,7 @@ RevEngineMain::RevEngineMain(const RevWindowData& data)
 	m_modelManager = new RevModelManager();
 	m_shaderManager = new RevShaderManager();
 }
-RevEngineMain* RevEngineMain::Construct(const RevWindowData& data)
+RevEngineMain* RevEngineMain::Construct(const RevEngineInitializationData& data)
 {
 	if(s_instance)
 	{
@@ -339,7 +341,7 @@ void RevEngineMain::PopulateCommandList() const
 	m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
 	// Record commands.
-	if (m_raster)
+	if (m_isRasterizationActive)
 	{
 		// #DXR Extra: Depth Buffering
 		m_commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
@@ -501,7 +503,7 @@ void RevEngineMain::OnKeyUp(const UINT8 key)
 {
 	if (key == VK_SPACE)
 	{
-		m_raster = !m_raster;
+		m_isRasterizationActive = !m_isRasterizationActive;
 	}
 }
 
