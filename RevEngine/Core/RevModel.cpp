@@ -30,7 +30,12 @@ void RevModel::DrawRasterized() const
 
 	ID3D12GraphicsCommandList* commandList = RevEngineRetrievalFunctions::GetCommandList();
 	commandList->SetPipelineState(m_d3dData.m_pso);
-	
+
+	if(m_d3dData.m_descriptorHeap.Get())
+	{
+		ID3D12DescriptorHeap* descriptorHeaps[] = { m_d3dData.m_descriptorHeap.Get() };
+		commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+	}
 	if(drawIndexed)
 	{
 		list->DrawIndexedInstanced(m_d3dData.m_indexCount, 1, 0, 0, 0);
