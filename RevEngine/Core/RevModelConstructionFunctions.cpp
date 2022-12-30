@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "RevModelConstructionFunctions.h"
-
-#include "RevModelLoader.h"
+#include "../RevModelLoader.h"
 #include "../D3D/RevD3DTypes.h"
 
 RevModelData RevModelConstructionFunctions::CreateModelDataType(RevModelInitializationData inData)

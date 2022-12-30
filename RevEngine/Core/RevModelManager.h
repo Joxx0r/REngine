@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "RevCoreDefines.h"
 #include "RevEngineManager.h"
@@ -26,7 +26,7 @@ private:
 
     RevModel* FindModelTypeInternal(RevEModelType desiredType);
     RevModel* FindModelHandleInternal(REV_ID_HANDLE handle);
-    
+
     std::vector<RevModel*> m_models;
     REV_ID_HANDLE m_modelCounter = 0;
 };

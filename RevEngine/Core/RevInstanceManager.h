@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <DirectXMath.h>
 
@@ -10,7 +10,7 @@ class RevCamera;
 enum RevEModelType : UINT8;
 
 namespace nv_helpers_dx12 {
-class TopLevelASGenerator;
+    class TopLevelASGenerator;
 }
 
 class RevModelManager;
@@ -21,13 +21,13 @@ public:
     RevInstanceManager() {};
 
     static void AddInstance(RevModelInitializationData data, DirectX::XMMATRIX transform);
-    static void AddAllInstancesToSBT(  nv_helpers_dx12::TopLevelASGenerator* generator);
-    
+    static void AddAllInstancesToSBT(nv_helpers_dx12::TopLevelASGenerator* generator);
+
     void DrawInstances(const RevDrawData& data);
 
 private:
-    
+
     std::vector<RevInstance*> m_instances;
-    
+
 };
 

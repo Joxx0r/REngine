@@ -15,68 +15,84 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="d3dx12.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DXSample.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DXSampleHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D3D12HelloTriangle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Win32Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BottomLevelASGenerator.h" />
-    <ClInclude Include="Core\RevCamera.h" />
-    <ClInclude Include="D3D12HelloTriangleTwo.h" />
     <ClInclude Include="DXRHelper.h" />
     <ClInclude Include="Misc\RevTypes.h" />
+    <ClInclude Include="Core\RevCoreDefines.h" />
+    <ClInclude Include="Core\RevEngineManager.h" />
+    <ClInclude Include="Core\RevEngineRetrievalFunctions.h" />
+    <ClInclude Include="Core\RevModelConstructionFunctions.h" />
+    <ClInclude Include="Core\RevModelTypes.h" />
+    <ClInclude Include="Core\RevScene.h" />
+    <ClInclude Include="Core\RevShaderManager.h" />
+    <ClInclude Include="Core\RevShaderTypes.h" />
+    <ClInclude Include="Core\RevUtils.h" />
+    <ClInclude Include="D3D\RevD3DTypes.h" />
+    <ClInclude Include="Microsoft\RevDDSTextureLoader.h" />
+    <ClInclude Include="RevEngineMain.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="BottomLevelASGenerator.h" />
+    <ClInclude Include="RevModelLoader.h" />
+    <ClInclude Include="Core\RevEngineExecutionFunctions.h" />
+    <ClInclude Include="Core\RevCamera.h" />
+    <ClInclude Include="Core\RevInstance.h" />
+    <ClInclude Include="Core\RevInstanceManager.h" />
+    <ClInclude Include="Core\RevModel.h" />
+    <ClInclude Include="Core\RevModelManager.h" />
     <ClInclude Include="RaytracingPipelineGenerator.h" />
     <ClInclude Include="RootSignatureGenerator.h" />
     <ClInclude Include="ShaderBindingTableGenerator.h" />
     <ClInclude Include="TopLevelASGenerator.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DXSample.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D3D12HelloTriangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Win32Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Core\RevEngineManager.cpp" />
+    <ClCompile Include="Core\RevEngineRetrievalFunctions.cpp" />
+    <ClCompile Include="Core\RevModelConstructionFunctions.cpp" />
+    <ClCompile Include="Core\RevScene.cpp" />
+    <ClCompile Include="Core\RevShaderManager.cpp" />
+    <ClCompile Include="Core\RevUtils.cpp" />
+    <ClCompile Include="D3D\RevD3DTypes.cpp" />
+    <ClCompile Include="Microsoft\RevDDSTextureLoader.cpp" />
+    <ClCompile Include="RevEngineMain.cpp" />
+    <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="BottomLevelASGenerator.cpp" />
+    <ClCompile Include="RevModelLoader.cpp" />
+    <ClCompile Include="Core\RevEngineExecutionFunctions.cpp" />
     <ClCompile Include="Core\RevCamera.cpp" />
-    <ClCompile Include="D3D12HelloTriangleTwo.cpp" />
+    <ClCompile Include="Core\RevInstance.cpp" />
+    <ClCompile Include="Core\RevInstanceManager.cpp" />
+    <ClCompile Include="Core\RevModel.cpp" />
+    <ClCompile Include="Core\RevModelManager.cpp" />
     <ClCompile Include="RaytracingPipelineGenerator.cpp" />
     <ClCompile Include="RootSignatureGenerator.cpp" />
     <ClCompile Include="ShaderBindingTableGenerator.cpp" />
     <ClCompile Include="TopLevelASGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="shaders.hlsl">
-      <Filter>Assets\Shaders</Filter>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\Common.hlsl" />
-    <None Include="Shaders\Hit.hlsl" />
-    <None Include="Shaders\Miss.hlsl" />
-    <None Include="Shaders\RayGen.hlsl" />
-    <None Include="Shaders\Shaders.hlsl" />
+    <None Include="..\Bin\Data\Shaders\Shaders\Common.hlsl" />
+    <None Include="..\Bin\Data\Shaders\Shaders\Hit.hlsl" />
+    <None Include="..\Bin\Data\Shaders\Shaders\Miss.hlsl" />
+    <None Include="..\Bin\Data\Shaders\Shaders\RayGen.hlsl" />
+    <None Include="..\Bin\Data\Shaders\Shaders\Shaders.hlsl" />
+    <None Include="..\Bin\Data\Shaders\Common.hlsl" />
+    <None Include="..\Bin\Data\Shaders\Hit.hlsl" />
+    <None Include="..\Bin\Data\Shaders\Miss.hlsl" />
+    <None Include="..\Bin\Data\Shaders\RayGen.hlsl" />
+    <None Include="..\Bin\Data\Shaders\Shaders.hlsl" />
+    <None Include="..\Bin\Data\Shaders\StaticModel.hlsl" />
   </ItemGroup>
 </Project>

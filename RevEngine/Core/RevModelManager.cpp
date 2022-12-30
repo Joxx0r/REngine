@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "RevModelManager.h"
 #include "RevCoreDefines.h"
 #include "RevEngineRetrievalFunctions.h"
@@ -13,44 +13,44 @@ RevModelManager* GetModelManagerInternal()
 RevModel* RevModelManager::FindModel(RevModelInitializationData desiredType, bool loadIfNotFound /*= true*/)
 {
     RevModelManager* modelManager = GetModelManagerInternal();
-    if(!modelManager)
+    if (!modelManager)
     {
         return nullptr;
     }
-    if(RevModel* model = modelManager->FindModelTypeInternal(desiredType.m_type))
+    if (RevModel* model = modelManager->FindModelTypeInternal(desiredType.m_type))
     {
         return model;
     }
-    if(loadIfNotFound)
+    if (loadIfNotFound)
     {
         return modelManager->CreateModelInternal(desiredType.m_type);
     }
     return nullptr;
 }
-RevModel* RevModelManager::FindModelFromHandle( REV_ID_HANDLE handle)
+RevModel* RevModelManager::FindModelFromHandle(REV_ID_HANDLE handle)
 {
     RevModelManager* modelManager = GetModelManagerInternal();
-    if(!modelManager)
+    if (!modelManager)
     {
         return nullptr;
     }
     return modelManager->FindModelHandleInternal(handle);
 }
 
-REV_ID_HANDLE RevModelManager::FindModelHandleFromType( RevModelInitializationData desiredType, bool loadIfNotFound)
+REV_ID_HANDLE RevModelManager::FindModelHandleFromType(RevModelInitializationData desiredType, bool loadIfNotFound)
 {
     RevModelManager* modelManager = GetModelManagerInternal();
-    if(!modelManager)
+    if (!modelManager)
     {
         return REV_ID_NONE;
     }
-    
-    if(RevModel* model = modelManager->FindModelTypeInternal(desiredType.m_type))
+
+    if (RevModel* model = modelManager->FindModelTypeInternal(desiredType.m_type))
     {
         return model->m_handle;
     }
 
-    if(loadIfNotFound)
+    if (loadIfNotFound)
     {
         return modelManager->CreateModelInternal(desiredType)->m_handle;
     }
@@ -61,7 +61,7 @@ RevModel* RevModelManager::CreateModelInternal(RevModelInitializationData inData
 {
     RevModel* model = new RevModel();
     m_modelCounter++;
-    model->Initialize(RevModelConstructionFunctions::CreateModelDataType(inData),m_modelCounter);
+    model->Initialize(RevModelConstructionFunctions::CreateModelDataType(inData), m_modelCounter);
     m_models.push_back(model);
     return model;
 }
@@ -69,11 +69,11 @@ RevModel* RevModelManager::CreateModelInternal(RevModelInitializationData inData
 void RevModelManager::GenerateAccelerationBuffersAllModels()
 {
     RevModelManager* modelManager = GetModelManagerInternal();
-    if(!modelManager)
+    if (!modelManager)
     {
         return;
     }
-    for(int index = 0; index < modelManager->m_models.size(); index++)
+    for (int index = 0; index < modelManager->m_models.size(); index++)
     {
         assert(modelManager->m_models[index]);
         modelManager->m_models[index]->CreateStructureBuffer();
@@ -82,10 +82,10 @@ void RevModelManager::GenerateAccelerationBuffersAllModels()
 
 RevModel* RevModelManager::FindModelTypeInternal(RevEModelType desiredType)
 {
-    for(int index = 0; index < m_models.size(); index++)
+    for (int index = 0; index < m_models.size(); index++)
     {
         assert(m_models[index]);
-        if(m_models[index]->m_modelData.m_type == desiredType)
+        if (m_models[index]->m_modelData.m_type == desiredType)
         {
             return m_models[index];
         }
@@ -94,10 +94,10 @@ RevModel* RevModelManager::FindModelTypeInternal(RevEModelType desiredType)
 }
 RevModel* RevModelManager::FindModelHandleInternal(REV_ID_HANDLE handle)
 {
-    for(int index = 0; index < m_models.size(); index++)
+    for (int index = 0; index < m_models.size(); index++)
     {
         assert(m_models[index]);
-        if(m_models[index]->m_handle == handle)
+        if (m_models[index]->m_handle == handle)
         {
             return m_models[index];
         }

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <DirectXMath.h>
 
 class RevEngineMain;
@@ -9,9 +9,9 @@ class RevCamera
 {
 public:
     RevCamera();
-    
+
     XMMATRIX m_matrix;
-    
+
     int m_startX = 0;
     int m_startY = 0;
     float m_yaw = -90.0f;

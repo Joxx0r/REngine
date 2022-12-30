@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <DirectXMath.h>
 
 
@@ -12,7 +12,7 @@ class RevInstance
 public:
     RevInstance() {};
 
-    void Initialize( RevModelInitializationData modelInitializationData, DirectX::XMMATRIX transform);
+    void Initialize(RevModelInitializationData modelInitializationData, DirectX::XMMATRIX transform);
     void DrawInstance(const RevDrawData& data);
 
     DirectX::XMMATRIX m_transform;
